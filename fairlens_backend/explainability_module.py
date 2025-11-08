@@ -126,10 +126,13 @@ def analyze_feature_impact(
     # Generate likely causes based on top features
     for feat_info in feature_deltas[:2]:  # Top 2 features
         if feat_info['delta'] > 0:
+            feature_name = feat_info['feature']
+            female_key = f'female_mean_{feature_name}'
+            male_key = f'male_mean_{feature_name}'
             likely_causes.append(
-                f"Lower average {feat_info['feature']} for females "
-                f"(Female: {stats[f'female_mean_{feat_info['feature']}']: .1f}, "
-                f"Male: {stats[f'male_mean_{feat_info['feature']}']: .1f})"
+                f"Lower average {feature_name} for females "
+                f"(Female: {stats[female_key]: .1f}, "
+                f"Male: {stats[male_key]: .1f})"
             )
     
     # Always mention approval rate difference if significant

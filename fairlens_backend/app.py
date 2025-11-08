@@ -261,8 +261,9 @@ if __name__ == '__main__':
     logger.info("  - Statistical explanations enable bias remediation")
     logger.info("")
     logger.info("=" * 60)
-    logger.info("FairLens API running on http://127.0.0.1:5000")
+    port = int(os.environ.get('FLASK_PORT', 8000))
+    logger.info(f"FairLens API running on http://127.0.0.1:{port}")
     logger.info("=" * 60)
     logger.info("")
     
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)

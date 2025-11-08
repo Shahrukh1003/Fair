@@ -7,3 +7,55 @@ packages = ["cargo", "glibcLocales", "libiconv", "libxcrypt", "openssl", "pkg-co
 [deployment]
 deploymentTarget = "autoscale"
 run = ["streamlit", "run", "app.py", "--server.port", "5000"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "streamlit-dashboard"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "flask-api-backend"
+
+[[workflows.workflow]]
+name = "streamlit-dashboard"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run fairlens_backend/dashboard.py --server.port 5000 --server.address 0.0.0.0"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "flask-api-backend"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "FLASK_PORT=8000 python fairlens_backend/app.py"
+waitForPort = 8000
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 8000
+externalPort = 8000
+
+[[ports]]
+localPort = 43127
+externalPort = 3000

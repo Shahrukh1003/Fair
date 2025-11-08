@@ -21,6 +21,9 @@ import plotly.graph_objects as go
 import plotly.express as px
 from datetime import datetime
 import time
+import subprocess
+import sys
+import os
 
 st.set_page_config(
     page_title="FairLens - Fairness Monitoring",
@@ -28,7 +31,33 @@ st.set_page_config(
     layout="wide"
 )
 
-API_BASE_URL = "http://127.0.0.1:5000"
+API_BASE_URL = "http://127.0.0.1:8000"
+
+@st.cache_resource
+def start_flask_api():
+    """Start Flask API on port 8000 in background."""
+    try:
+        response = requests.get(f"{API_BASE_URL}/api/health", timeout=1)
+        if response.status_code == 200:
+            return True
+    except:
+        pass
+    
+    try:
+        flask_process = subprocess.Popen(
+            [sys.executable, "-c", 
+             "from fairlens_backend.app import app; app.run(host='0.0.0.0', port=8000, debug=False, use_reloader=False)"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=os.path.dirname(os.path.dirname(__file__))
+        )
+        time.sleep(3)
+        return True
+    except Exception as e:
+        st.error(f"Failed to start Flask API: {str(e)}")
+        return False
+
+start_flask_api()
 
 
 def check_api_health():
