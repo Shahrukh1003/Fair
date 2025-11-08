@@ -1,0 +1,582 @@
+# Prompt for implementing **FairLens – Fairness Drift Alert System** (complete, no detail omitted)
+
+Use this prompt to implement the full FairLens backend + optional dashboard exactly as requested across all earlier messages. It consolidates **every requirement**, file-by-file, behavior-by-behavior, test commands, run instructions, and Git/Replit steps so nothing is missed.
+
+> **Goal (summary):** Build a lightweight, runnable Flask-based Fairness Drift Alert System inside a new folder `fairlens_backend/` that (1) simulates loan decisions, (2) computes fairness using Disparate Impact Ratio (DIR) and/or group gap, (3) triggers & encrypts alerts, (4) writes immutable compliance logs, (5) generates simple explanations for bias causes, and (6) exposes a Streamlit dashboard that visualizes trends. The system must run locally on Replit with `python3 fairlens_backend/app.py` (Flask) and `streamlit run fairlens_backend/dashboard.py` (dashboard).
+
+---
+
+# Global constraints / assumptions
+
+* Do **not** modify or delete any existing files in the repository outside `fairlens_backend/`. Only add new files under `fairlens_backend/`.
+* Use **relative imports** inside `fairlens_backend` so it can integrate with the existing fairness library if present. But the modules must also work standalone if parent repo utilities are missing (fallback to internal implementation).
+* Keep the code lightweight and free of external API calls (no internet required).
+* Python 3.x, target environment: Replit (free tier).
+* Use clear docstrings and inline comments for every function and module.
+* Exception handling: handle missing or zero counts gracefully (no unhandled ZeroDivisionError).
+* Security: encryption for alerts via `cryptography.Fernet`. Key storage may be a local file `fernet.key` in `fairlens_backend/` for demo; include code to create a key if missing.
+* Reproducibility: use `numpy.random.seed(42)` in data generator unless otherwise noted.
+* Thresholds to implement:
+
+  * **DIR threshold** for legal fairness: `DIR < 0.8` → alert (EEOC 80% rule).
+  * **Gap threshold** for simple simulation view (optional): `abs(male_rate - female_rate) > 0.2` → alert.
+* Logging: use Python `logging` for console messages and implement audit logging (append-only JSONL) for compliance.
+
+---
+
+# Files to create inside `fairlens_backend/` (exact names)
+
+1. `data_simulator.py`
+2. `fairness_metrics.py`
+3. `security_utils.py`
+4. `compliance_logger.py`
+5. `explainability_module.py`
+6. `app.py`  (Flask API)
+7. `dashboard.py`  (Streamlit dashboard — optional but required)
+8. `requirements.txt`
+
+Each file below contains **exact required functionality and API**. Implement each module per the spec.
+
+---
+
+## 1) `data_simulator.py`
+
+**Purpose:** generate synthetic loan application records with controllable bias.
+
+**Top-level imports**
+
+```py
+import pandas as pd
+import numpy as np
+from typing import Tuple
+```
+
+**Key function**
+
+```py
+def generate_loan_data(n_samples: int, drift_level: float, seed: int = 42) -> pd.DataFrame:
+```
+
+**Behavior / details**
+
+* `n_samples`: total rows to generate (split approx. evenly between Male and Female).
+* `drift_level`: float in [0.0, 1.0], 0.0 = no bias, 1.0 = strong bias. Use this to **reduce female approval probability** relative to base.
+* `seed`: default `42`. Use `np.random.seed(seed)` for reproducibility.
+* `base_approval_rate = 0.70` (70%).
+* Compute `female_approval_rate = max(0.0, base_approval_rate - drift_level * 0.4)`
+  (so if `drift_level=1.0`, female approval goes to `0.30` — adjust formula if you prefer an alternative linear mapping but keep comment explaining it).
+* `male_approval_rate = base_approval_rate` (for simulation).
+* Generate columns:
+
+  * `application_id` (int, 1..n_samples)
+  * `gender` ('Male'/'Female')
+  * `credit_score` (int uniform or normal between 500 and 800; e.g. `np.random.randint(500, 801, size=n_samples)` or `np.clip(np.random.normal(650, 60), 500, 800).astype(int)`)
+  * `approved` (bool) — sample using per-group approval rate (`np.random.rand() < rate`)
+* Return `pd.DataFrame([...])`.
+* Add docstring and comments explaining exactly **how bias is injected** (i.e. by lowering female approval probability proportionally to `drift_level`).
+
+**Edge cases**
+
+* If `n_samples < 2`, still work — just generate minimal rows.
+* Ensure both groups are present (if odd sample split, distribute so both groups appear).
+
+---
+
+## 2) `fairness_metrics.py`
+
+**Purpose:** compute Disparate Impact Ratio (DIR) and optionally group gap.
+
+**Top-level imports**
+
+```py
+import pandas as pd
+from typing import Dict
+```
+
+**Key function**
+
+```py
+def calculate_disparate_impact_ratio(df: pd.DataFrame,
+                                     protected_attribute: str = "gender",
+                                     protected_value: str = "Female",
+                                     privileged_value: str = "Male",
+                                     outcome: str = "approved") -> Dict:
+```
+
+**Behavior / details**
+
+* Compute approval rates:
+
+  * `female_rate = approved_count_female / total_female` (float 0–1)
+  * `male_rate = approved_count_male / total_male`
+* Compute `dir_value = female_rate / male_rate` **only if male_rate > 0**. If `male_rate == 0`, set `dir_value = None` and `alert = True` (and include reason `male_rate_zero`).
+* `alert = True` if `dir_value is None or dir_value < 0.8`.
+* Also compute `gap = abs(male_rate - female_rate)` (useful for simple visualization), and `gap_alert = gap > 0.2` (this is the 20% gap rule used in the simpler demo).
+* Return dictionary:
+
+```py
+{
+  "female_rate": float,
+  "male_rate": float,
+  "dir": float or None,
+  "dir_alert": bool,
+  "gap": float,
+  "gap_alert": bool,
+  "details": { "female_count": int, "male_count": int }
+}
+```
+
+* Add inline comments explaining the **80% rule** and decision logic.
+
+**Edge cases**
+
+* If groups missing: set rates to 0 and produce clear messages in the return dict.
+
+---
+
+## 3) `security_utils.py`
+
+**Purpose:** anonymize and encrypt/decrypt alert messages.
+
+**Dependencies:** `cryptography` (Fernet), `hashlib`, `os`
+
+**Top-level imports**
+
+```py
+import hashlib
+import os
+from cryptography.fernet import Fernet
+from typing import Tuple
+import pandas as pd
+```
+
+**Functions required**
+
+1. `def init_key(key_path: str = "fernet.key") -> bytes:`
+
+   * If `key_path` exists read and return the key; else generate `Fernet.generate_key()` and write to file. Return key bytes.
+   * Comment clearly: **this is demo storage** — production should use a secrets manager.
+
+2. `def encrypt_alert(message: str, key: bytes = None) -> str:`
+
+   * Use provided `key` or call `init_key()` to get key.
+   * Return the encrypted token as a UTF-8 string.
+
+3. `def decrypt_alert(token: str, key: bytes = None) -> str:`
+
+   * Decrypt and return plaintext.
+   * If decryption fails, raise or return a helpful message.
+
+4. `def anonymize_data(df: pd.DataFrame, id_columns: list = ["application_id"]) -> pd.DataFrame:`
+
+   * For any column in `id_columns` that exists in `df`, replace values with `SHA256(original_value_as_str).hexdigest()` (use `hashlib.sha256`).
+   * Return a copy of the DataFrame with anonymized IDs (do not modify input in-place unless documented).
+   * Add docstrings explaining: this is pseudonymization for demo; not GDPR-level reversible masking.
+
+---
+
+## 4) `compliance_logger.py`
+
+**Purpose:** append-only, immutable JSONL audit log for compliance.
+
+**Top-level imports**
+
+```py
+import json
+from datetime import datetime
+import threading
+from typing import Dict, List
+import os
+```
+
+**Function signatures**
+
+1. `def log_event(event_type: str, details: Dict, log_path: str = "compliance_audit_log.jsonl") -> None:`
+
+   * Create an entry:
+
+```py
+entry = {
+  "timestamp": datetime.utcnow().isoformat(),
+  "event_type": event_type,
+  "details": details
+}
+```
+
+* Append JSON serialized `entry` to `log_path` with newline. Use file open mode `'a'`.
+* Implement a simple `threading.Lock()` for safe concurrent appends (demo).
+* Ensure `fsync` or flush to reduce chance of loss (call `fh.flush()` and `os.fsync(fh.fileno())` if available).
+* Add comments explaining how it satisfies an immutable audit trail (append-only local log).
+
+2. `def get_audit_history(log_path: str = "compliance_audit_log.jsonl", last_n: int = 10) -> List[Dict]:`
+
+   * Read last `last_n` entries (efficient approach: read file lines and take tail).
+   * Parse JSON per-line and return list of dicts (most recent first is OK).
+   * If file missing, return `[]`.
+
+**Other**
+
+* Document that the log contains encrypted alert token if one was created; provide storage layout example.
+
+---
+
+## 5) `explainability_module.py`
+
+**Purpose:** quick statistical explanations for why bias occurred.
+
+**Top-level imports**
+
+```py
+import pandas as pd
+from typing import Dict, List
+```
+
+**Functions**
+
+1. `def analyze_feature_impact(df: pd.DataFrame, protected_attribute: str = "gender", numeric_cols: List[str] = ["credit_score"]) -> Dict:`
+
+   * Calculate group-level statistics: `mean`, `median`, `approval_rate` per `protected_attribute`.
+   * Compare female vs male means for each numeric column and compute difference `delta = male_mean - female_mean` (or vice versa — state it).
+   * Create a ranked list of the top 2 contributing features (largest absolute normalized difference).
+   * Return:
+
+```py
+{
+  "likely_causes": ["Lower average credit_score for females", "Lower female approval rate at this drift level"],
+  "stats": { "female_mean_credit_score": X, "male_mean_credit_score": Y, "female_approval_rate": A, "male_approval_rate": B }
+}
+```
+
+2. `def generate_explanation(dir_value: float, causes_list: List[str]) -> str:`
+
+   * Return human readable string, e.g.:
+
+     * If `dir_value is None` → `"DIR not computable: male approval rate zero."`
+     * If `dir_value < 0.8` → `"DIR = 0.64 (<0.8). Potential bias — likely causes: <list>."`
+     * Else `"DIR = 0.85 (>=0.8). System considered fair; possible minor contributing factors: <list>."`
+
+**Comments**
+
+* Explain the limitations: purely statistical; causal inference and fairness-aware ML analyses are out-of-scope for this demo.
+
+---
+
+## 6) `app.py` (Flask API)
+
+**Purpose:** orchestrator — endpoint(s), integration glue, logging, encryption.
+
+**Top-level imports**
+
+```py
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+import logging
+import os
+```
+
+* Also import the modules created above with **relative imports**:
+
+```py
+from .data_simulator import generate_loan_data
+from .fairness_metrics import calculate_disparate_impact_ratio
+from .security_utils import encrypt_alert, decrypt_alert, init_key, anonymize_data
+from .compliance_logger import log_event, get_audit_history
+from .explainability_module import analyze_feature_impact, generate_explanation
+```
+
+> *Note:* If running as a script (not package), you may need `if __name__ == "__main__":` and `from data_simulator import ...` fallback — implement an import fallback mechanism so module works both when run directly and when used as a package.
+
+**Flask app behavior**
+
+* Initialize Flask and CORS:
+
+```py
+app = Flask(__name__)
+CORS(app)
+logging.basicConfig(level=logging.INFO)
+```
+
+**Endpoints**
+
+1. `GET /api/monitor_fairness`
+
+* Query params optional:
+
+  * `n_samples` (default 1000)
+  * `drift_level` (default 0.5 for drifted scenario)
+* Steps:
+
+  1. Generate two datasets:
+
+     * `fair_data = generate_loan_data(n_samples, drift_level=0.0)`
+     * `drifted_data = generate_loan_data(n_samples, drift_level=drift_level)`
+  2. Compute fairness for both using `calculate_disparate_impact_ratio(...)`.
+  3. For the `drifted` scenario:
+
+     * Run `analyze_feature_impact(drifted_data)` → `causes`
+     * `explanation = generate_explanation(dir_value, causes_list)`
+  4. If `dir_alert` is `True`:
+
+     * `encrypted = encrypt_alert(explanation, key)` (using `init_key()` to provide `key`)
+     * Log event via `log_event("fairness_check", { ... include dir, alert, drift_level, encrypted_alert_token ...})`
+     * Print console logs:
+
+       * `⚠ ALERT: Fairness Drift Detected! DIR = {dir}`
+       * Also print decrypted message for debug: `Decrypted: {decrypt_alert(encrypted, key)}`
+  5. If `dir_alert` is `False`:
+
+     * Log event similarly (with `encrypted_alert` optional).
+     * Print `✅ Model Fairness Stable. DIR = {dir}`
+  6. Prepare JSON response object with:
+
+```py
+{
+  "fair_scenario": { "female_rate": X, "male_rate": Y, "dir": Z, "dir_alert": False, "gap": G, "gap_alert": False },
+  "drifted_scenario": { "female_rate": ..., "male_rate": ..., "dir": ..., "dir_alert": bool, "gap": ..., "gap_alert": bool, "explanation": "...", "encrypted_alert": "..." },
+  "audit_tail": [ ... last 10 audit entries ... ]
+}
+```
+
+* Return `jsonify(response)`
+
+2. `GET /api/audit_history`
+
+* Return `get_audit_history()` (last 10 entries).
+* Protect as public for demo; note in comments that in production this should be access-controlled.
+
+**Logging**
+
+* Use Python `logging` module to log both INFO and ALERT-level messages.
+* Output must include both encrypted token and decrypted message in console for debugging.
+
+**Error handling**
+
+* If any step fails, return a 500 JSON error with helpful message.
+* Use try/except blocks around data generation and encryption.
+
+**Start-up**
+
+* If run as script: `python3 fairlens_backend/app.py` should start Flask on port `5000`.
+* Print friendly startup line: `"FairLens API running on http://127.0.0.1:5000"`
+
+---
+
+## 7) `dashboard.py` (Streamlit — optional but required)
+
+**Purpose:** lightweight visual monitor; refreshes every 5 seconds.
+
+**Top-level imports**
+
+```py
+import streamlit as st
+import requests
+import pandas as pd
+import time
+from streamlit_autorefresh import st_autorefresh
+```
+
+**Behavior**
+
+* Call local API `/api/monitor_fairness` (default `http://127.0.0.1:5000/api/monitor_fairness`) and render:
+
+  * Current DIR for drifted scenario as large metric badge.
+  * Color-coded status: red if `dir_alert` true else green.
+  * Line chart showing a short history of DIR values. Because API returns only one run, the dashboard should store last N results in session state and plot the trend.
+  * Show explanation text and decrypted explanation (call decrypt endpoint or embed decrypted explanation from API response).
+* Auto-refresh every 5 seconds using `st_autorefresh` or `st.experimental_rerun()` loop.
+* Provide simple controls:
+
+  * `n_samples` slider
+  * `drift_level` slider
+  * Manual “Refresh” button
+* Document how to start dashboard: `streamlit run fairlens_backend/dashboard.py`
+
+---
+
+## 8) `requirements.txt`
+
+Include exact packages:
+
+```
+flask
+flask-cors
+pandas
+numpy
+cryptography
+streamlit
+streamlit-autorefresh
+```
+
+(If `streamlit-autorefresh` not available, use `streamlit` built-in re-run tricks. Add note to adapt.)
+
+---
+
+# Example console output expectations
+
+* On a drifted scenario where DIR < 0.8:
+
+```
+INFO: Generating fair and drifted datasets (n=1000, drift=0.5)
+⚠ ALERT: Fairness Drift Detected! DIR = 0.64
+Encrypted alert token: gAAAAAA...
+Decrypted alert: DIR = 0.64 (< 0.8). Potential bias due to lower female credit scores.
+INFO: Event logged at compliance_audit_log.jsonl
+```
+
+* On fair scenario:
+
+```
+INFO: Model Fairness Stable. DIR = 0.85
+INFO: Event logged at compliance_audit_log.jsonl
+```
+
+---
+
+# Example API request/response (curl)
+
+**Request:**
+
+```bash
+curl -s "http://127.0.0.1:5000/api/monitor_fairness?n_samples=1000&drift_level=0.5" | jq
+```
+
+**Example response:**
+
+```json
+{
+  "fair_scenario": {
+    "female_rate": 0.70,
+    "male_rate": 0.70,
+    "dir": 1.0,
+    "dir_alert": false,
+    "gap": 0.0,
+    "gap_alert": false
+  },
+  "drifted_scenario": {
+    "female_rate": 0.36,
+    "male_rate": 0.70,
+    "dir": 0.5142857,
+    "dir_alert": true,
+    "gap": 0.34,
+    "gap_alert": true,
+    "explanation": "DIR = 0.51 (<0.8). Likely causes: Lower average credit_score for females, Lower female approval at drift level 0.5",
+    "encrypted_alert": "gAAAAA...."
+  },
+  "audit_tail": [
+    { "timestamp": "...", "event_type": "fairness_check", "details": { ... } },
+    ...
+  ]
+}
+```
+
+---
+
+# Tests to run locally (Replit)
+
+1. Start Flask:
+
+```bash
+python3 fairlens_backend/app.py
+# or
+FLASK_APP=fairlens_backend.app python -m flask run --port 5000
+```
+
+2. Visit `http://127.0.0.1:5000/api/monitor_fairness` in browser or via curl.
+3. Start Streamlit:
+
+```bash
+streamlit run fairlens_backend/dashboard.py
+```
+
+4. Check `compliance_audit_log.jsonl` content to verify append-only entries.
+5. Confirm `fernet.key` created and encrypted tokens returned.
+
+---
+
+# Git / Replit instructions (what you must do, not the system)
+
+> I cannot perform git commits/pushes for you. Do the following locally or in Replit Git UI.
+
+1. Create branch and add files:
+
+```bash
+git checkout -b fairlens_integration
+git add fairlens_backend/
+git commit -m "feat(fairlens): add FairLens backend + dashboard (data_simulator, metrics, security, compliance, explainability, Flask API, Streamlit dashboard)"
+git push origin fairlens_integration
+```
+
+2. Open Pull Request to main / master for review.
+
+---
+
+# Documentation & comments requirement
+
+* Each file must begin with a docstring:
+
+  * Purpose of file
+  * How it fits into the FairLens pipeline (Data → Metric → Detect → Alert → Log → Explain → Visualize)
+* Each public function must have a docstring describing parameters, return values, and examples.
+* At the end of `app.py`, include a short commented summary explaining:
+
+  * How fairness drift is calculated (DIR formula & gap)
+  * How the system detects drift
+  * How to run Flask & Streamlit in Replit
+  * How this relates to Ethical AI and banking compliance (80% rule, audit traceability)
+
+---
+
+# Optional / Advanced features (implement only if time permits)
+
+* Add JWT or API token-based RBAC for the `/api/audit_history` endpoint (roles: monitor, auditor, admin); otherwise, document it's missing.
+* Add `trend` persistence (SQLite or CSV) to store DIR over time for richer dashboard trend lines.
+* Add SHA256 fingerprints for each audit log entry for tamper evidence (store fingerprint within JSONL and provide `verify_entry(record_hash)` method).
+* Add simulated blockchain anchor file storing `record_hash -> tx_id` pairs for demo non-repudiation.
+
+---
+
+# Final verification checklist (deliverable)
+
+* [ ] All files created under `fairlens_backend/` with exact names above.
+* [ ] `python3 fairlens_backend/app.py` starts Flask and responds on `/api/monitor_fairness` and `/api/audit_history`.
+* [ ] `streamlit run fairlens_backend/dashboard.py` loads dashboard that auto-refreshes and displays DIR & explanation.
+* [ ] Compliance log file `compliance_audit_log.jsonl` receives append-only JSON lines with timestamps and encrypted tokens.
+* [ ] Console prints both encrypted and decrypted alert messages for drifted scenario.
+* [ ] `requirements.txt` contains all dependencies; instructions for `pip install -r requirements.txt` included in README or comments.
+* [ ] Clear docstrings and comments present in every file.
+* [ ] Git branch created: `fairlens_integration` (you will commit & push).
+
+---
+
+# Deliverable (what to hand back to me)
+
+Either:
+
+* A PR branch `fairlens_integration` with the folder `fairlens_backend/` containing the files above (if you can push), **or**
+* A zip of `fairlens_backend/` containing all files, plus `requirements.txt`, with explicit instructions to run the two commands:
+
+  * `python3 fairlens_backend/app.py`
+  * `streamlit run fairlens_backend/dashboard.py`
+
+---
+
+# Short note for implementer / AI developer
+
+* Keep functions small and unit-testable.
+* Use informative logging and do not log PII (make sure `anonymize_data()` is used before any logging of IDs).
+* Keep encryption key creation transparent (create and store in `fernet.key` with a comment warning about production secrets).
+* Make minimal external dependencies; avoid heavy packages beyond those listed.
+* Aim for clear, readable code — this is a hackathon demo but also a candidate for GHCI security/compliance round.
+
+---
+
+If you want, I can now:
+
+1. Generate the **complete code for each of these files** (full working implementations) in this chat so you can paste them into `fairlens_backend/`.
+2. Or produce a single `main.py` that includes a compact demo combining all modules (not recommended because you requested modular file structure).
+
+Tell me **which** you want next:
+
+* `A` → Generate full code for all files exactly as specified (one message containing content for each file).
+* `B` → Just generate starter templates (docstrings, function shells) for you or your team to finish.
+* `C` → Generate the complete runnable code **and** produce a `zip` download (I can produce code; packaging must be done locally or via Replit UI).
