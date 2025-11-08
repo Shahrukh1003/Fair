@@ -10,17 +10,29 @@ import {
   Alert,
   Snackbar,
   Stack,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import LogoutIcon from '@mui/icons-material/Logout';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { ControlPanel } from './components/ControlPanel';
 import { MetricsOverview } from './components/MetricsOverview';
 import { AlertPanel } from './components/AlertPanel';
 import { ChartsSection } from './components/ChartsSection';
 import { AuditLogTable } from './components/AuditLogTable';
+import { Login } from './components/Login';
+import { FairnessTrend } from './components/FairnessTrend';
+import { PreAlertPanel } from './components/PreAlertPanel';
+import { BlockchainAudit } from './components/BlockchainAudit';
 import { useMonitorMutation, useAuditHistory, useHealthCheck } from './hooks/useFairnessMonitor';
+import { authUtils } from './api/client';
 import type { FairnessCheckResponse } from './types/fairness';
 
 const theme = createTheme({
@@ -175,11 +187,29 @@ function DashboardContent() {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [nSamples, setNSamples] = useState(1000);
   const [driftLevel, setDriftLevel] = useState(0.5);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' | 'warning' | 'info' });
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const navigate = useNavigate();
 
   const monitorMutation = useMonitorMutation();
   const { data: auditHistory, refetch: refetchAudit } = useAuditHistory(20);
   const { data: health } = useHealthCheck();
+  
+  const userRole = authUtils.getRole();
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    authUtils.clearAuth();
+    navigate('/login');
+    handleMenuClose();
+  };
 
   const handleRunCheck = (samples: number, drift: number) => {
     setNSamples(samples);
@@ -315,40 +345,71 @@ function DashboardContent() {
               </Typography>
             </Box>
           </Box>
-          {health && (
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1.5,
-              background: 'rgba(16, 185, 129, 0.15)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              px: 3,
-              py: 1,
-              borderRadius: 3,
-              boxShadow: '0 4px 20px rgba(16, 185, 129, 0.3)',
-              border: '1px solid rgba(16, 185, 129, 0.3)',
-              animation: 'slideInRight 0.6s ease-out',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: 'rgba(16, 185, 129, 0.25)',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 6px 25px rgba(16, 185, 129, 0.4)',
-              }
-            }}>
-              <Box sx={{ 
-                width: 10, 
-                height: 10, 
-                borderRadius: '50%', 
-                bgcolor: '#10b981',
-                boxShadow: '0 0 15px rgba(16, 185, 129, 0.8), 0 0 30px rgba(16, 185, 129, 0.4)',
-                animation: 'pulse 2s infinite'
-              }} />
-              <Typography variant="body2" sx={{ fontWeight: 700, color: 'white', letterSpacing: '-0.01em' }}>
-                System Online
-              </Typography>
-            </Box>
-          )}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {health && (
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+                background: 'rgba(16, 185, 129, 0.15)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                px: 3,
+                py: 1,
+                borderRadius: 3,
+                boxShadow: '0 4px 20px rgba(16, 185, 129, 0.3)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                animation: 'slideInRight 0.6s ease-out',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  background: 'rgba(16, 185, 129, 0.25)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 25px rgba(16, 185, 129, 0.4)',
+                }
+              }}>
+                <Box sx={{ 
+                  width: 10, 
+                  height: 10, 
+                  borderRadius: '50%', 
+                  bgcolor: '#10b981',
+                  boxShadow: '0 0 15px rgba(16, 185, 129, 0.8), 0 0 30px rgba(16, 185, 129, 0.4)',
+                  animation: 'pulse 2s infinite'
+                }} />
+                <Typography variant="body2" sx={{ fontWeight: 700, color: 'white', letterSpacing: '-0.01em' }}>
+                  System Online
+                </Typography>
+              </Box>
+            )}
+            <IconButton
+              onClick={handleMenuClick}
+              sx={{
+                color: 'white',
+                bgcolor: 'rgba(255, 255, 255, 0.1)',
+                '&:hover': {
+                  bgcolor: 'rgba(255, 255, 255, 0.2)',
+                },
+              }}
+            >
+              <AccountCircleIcon />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            >
+              <MenuItem disabled>
+                <Typography variant="caption" color="text.secondary">
+                  Role: {userRole?.toUpperCase() || 'UNKNOWN'}
+                </Typography>
+              </MenuItem>
+              <MenuItem onClick={handleLogout}>
+                <LogoutIcon sx={{ mr: 1, fontSize: 20 }} />
+                Logout
+              </MenuItem>
+            </Menu>
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -443,55 +504,62 @@ function DashboardContent() {
             flexShrink: 0,
             animation: 'slideInLeft 0.8s ease-out',
           }}>
-            <ControlPanel
-              onRunCheck={handleRunCheck}
-              isLoading={monitorMutation.isPending}
-              autoRefresh={autoRefresh}
-              onAutoRefreshToggle={setAutoRefresh}
-            />
+            <Stack spacing={3}>
+              <ControlPanel
+                onRunCheck={handleRunCheck}
+                isLoading={monitorMutation.isPending}
+                autoRefresh={autoRefresh}
+                onAutoRefreshToggle={setAutoRefresh}
+              />
+              <FairnessTrend />
+            </Stack>
           </Box>
 
           <Box sx={{ 
             flexGrow: 1,
             animation: 'slideInRight 0.8s ease-out',
           }}>
-            {monitorMutation.isPending && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
-                <CircularProgress size={60} />
-                <Typography variant="h6" sx={{ ml: 2 }}>
-                  Running fairness check...
-                </Typography>
-              </Box>
-            )}
+            <Stack spacing={3}>
+              <PreAlertPanel />
 
-            {monitorMutation.isError && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                <Typography variant="body2">
-                  Failed to connect to the API. Please ensure the Flask backend is running on port 8000.
-                </Typography>
-              </Alert>
-            )}
+              {monitorMutation.isPending && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
+                  <CircularProgress size={60} />
+                  <Typography variant="h6" sx={{ ml: 2 }}>
+                    Running fairness check...
+                  </Typography>
+                </Box>
+              )}
 
-            {lastResult && !monitorMutation.isPending && (
-              <Stack spacing={3}>
-                <AlertPanel scenario={lastResult.drifted_scenario} />
-                <MetricsOverview scenario={lastResult.drifted_scenario} />
-                {lastResult.fair_scenario && (
-                  <MetricsOverview scenario={lastResult.fair_scenario} isFair />
-                )}
-              </Stack>
-            )}
+              {monitorMutation.isError && (
+                <Alert severity="error">
+                  <Typography variant="body2">
+                    Failed to connect to the API. Please ensure the Flask backend is running on port 8000.
+                  </Typography>
+                </Alert>
+              )}
 
-            {!lastResult && !monitorMutation.isPending && (
-              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'grey.50' }}>
-                <Typography variant="h6" color="text.secondary" gutterBottom>
-                  No fairness check has been run yet
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Use the controls on the left to configure and run your first fairness check
-                </Typography>
-              </Paper>
-            )}
+              {lastResult && !monitorMutation.isPending && (
+                <>
+                  <AlertPanel scenario={lastResult.drifted_scenario} />
+                  <MetricsOverview scenario={lastResult.drifted_scenario} />
+                  {lastResult.fair_scenario && (
+                    <MetricsOverview scenario={lastResult.fair_scenario} isFair />
+                  )}
+                </>
+              )}
+
+              {!lastResult && !monitorMutation.isPending && (
+                <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'grey.50' }}>
+                  <Typography variant="h6" color="text.secondary" gutterBottom>
+                    No fairness check has been run yet
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Use the controls on the left to configure and run your first fairness check
+                  </Typography>
+                </Paper>
+              )}
+            </Stack>
           </Box>
         </Box>
 
@@ -503,6 +571,7 @@ function DashboardContent() {
               auditHistory={auditHistory}
             />
             <AuditLogTable entries={auditHistory} />
+            <BlockchainAudit />
           </Stack>
         )}
       </Container>
@@ -555,7 +624,7 @@ function DashboardContent() {
                   mb: 0.5,
                 }}
               >
-                EEOC 80% Rule Compliance | Predictive Monitoring
+                EEOC 80% Rule Compliance | Predictive Monitoring Active
               </Typography>
               <Typography 
                 variant="caption" 
@@ -588,12 +657,35 @@ function DashboardContent() {
   );
 }
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const isAuthenticated = authUtils.isAuthenticated();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return <>{children}</>;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <DashboardContent />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardContent />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>
   );

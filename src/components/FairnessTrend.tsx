@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Box, Paper, Typography, Chip, CircularProgress, Alert, Grid } from '@mui/material';
+import { Box, Paper, Typography, Chip, CircularProgress, Alert } from '@mui/material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
@@ -7,7 +7,7 @@ import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import { fairnessApi } from '../api/client';
 
 export function FairnessTrend() {
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['fairnessTrend'],
     queryFn: fairnessApi.getFairnessTrend,
     refetchInterval: 30000,
@@ -82,48 +82,40 @@ export function FairnessTrend() {
         />
       </Box>
 
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={6} md={3}>
-          <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-            <Typography variant="caption" color="text.secondary" fontWeight={600}>
-              Average DIR
-            </Typography>
-            <Typography variant="h6" fontWeight={700} color={data.average_dir < 0.8 ? 'error.main' : 'success.main'}>
-              {data.average_dir.toFixed(3)}
-            </Typography>
-          </Box>
-        </Grid>
-        <Grid item xs={6} md={3}>
-          <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-            <Typography variant="caption" color="text.secondary" fontWeight={600}>
-              Min DIR
-            </Typography>
-            <Typography variant="h6" fontWeight={700}>
-              {data.min_dir.toFixed(3)}
-            </Typography>
-          </Box>
-        </Grid>
-        <Grid item xs={6} md={3}>
-          <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-            <Typography variant="caption" color="text.secondary" fontWeight={600}>
-              Max DIR
-            </Typography>
-            <Typography variant="h6" fontWeight={700}>
-              {data.max_dir.toFixed(3)}
-            </Typography>
-          </Box>
-        </Grid>
-        <Grid item xs={6} md={3}>
-          <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-            <Typography variant="caption" color="text.secondary" fontWeight={600}>
-              Alerts
-            </Typography>
-            <Typography variant="h6" fontWeight={700} color="error.main">
-              {data.alert_count}/{data.data_points}
-            </Typography>
-          </Box>
-        </Grid>
-      </Grid>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 2, mb: 3 }}>
+        <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+          <Typography variant="caption" color="text.secondary" fontWeight={600}>
+            Average DIR
+          </Typography>
+          <Typography variant="h6" fontWeight={700} color={data.average_dir < 0.8 ? 'error.main' : 'success.main'}>
+            {data.average_dir.toFixed(3)}
+          </Typography>
+        </Box>
+        <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+          <Typography variant="caption" color="text.secondary" fontWeight={600}>
+            Min DIR
+          </Typography>
+          <Typography variant="h6" fontWeight={700}>
+            {data.min_dir.toFixed(3)}
+          </Typography>
+        </Box>
+        <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+          <Typography variant="caption" color="text.secondary" fontWeight={600}>
+            Max DIR
+          </Typography>
+          <Typography variant="h6" fontWeight={700}>
+            {data.max_dir.toFixed(3)}
+          </Typography>
+        </Box>
+        <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+          <Typography variant="caption" color="text.secondary" fontWeight={600}>
+            Alerts
+          </Typography>
+          <Typography variant="h6" fontWeight={700} color="error.main">
+            {data.alert_count}/{data.data_points}
+          </Typography>
+        </Box>
+      </Box>
 
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={chartData}>
