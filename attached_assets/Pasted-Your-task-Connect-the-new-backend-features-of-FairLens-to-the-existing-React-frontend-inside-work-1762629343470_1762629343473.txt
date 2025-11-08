@@ -1,0 +1,57 @@
+Your task: Connect the new backend features of FairLens to the existing React frontend inside ~/workspace/fairlens-frontend.
+
+Backend endpoints now available:
+- GET  /api/fairness_trend
+- GET  /api/pre_alert
+- GET  /api/predict_fairness_drift
+- GET  /api/verify_alert/<record_id>
+- GET  /api/get_anchor/<hash>
+- POST /api/login
+- POST /api/submit_predictions
+
+Update frontend accordingly:
+-------------------------------------------------------
+1️⃣ Create new React component FairnessTrend.jsx
+- Fetch data from /api/fairness_trend
+- Display trend line graph using Recharts
+- Show average DIR, and status (up/down/stable)
+
+2️⃣ Create new React component AlertsPanel.jsx
+- Fetch from /api/pre_alert and /api/predict_fairness_drift
+- Show warnings like “Fairness Degrading” or “Bias Detected”
+- Use colored badges (green/yellow/red)
+
+3️⃣ Create simple Login.jsx page
+- Role selector (monitor, auditor, admin)
+- On submit, POST to /api/login
+- Store returned token in localStorage
+- Redirect user to dashboard
+
+4️⃣ Update existing App.jsx
+- Add routing: /login → Login.jsx, /dashboard → existing dashboard
+- Use stored token to authenticate requests (Authorization header)
+
+5️⃣ Create simple BlockchainAudit.jsx component
+- Accept hash input → fetch /api/get_anchor/<hash>
+- Display “Anchor Verified” with fake tx_id
+
+6️⃣ Modify API base URL in api.js
+- Replace with: const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:5000";
+
+7️⃣ Improve dashboard UI
+- Add small trend preview section under “Fairness Check Controls”
+- Add “Pre-Alert” card when fairness is degrading but still above 0.8
+
+8️⃣ Add proper Toast notifications
+- “✅ Fairness check complete”
+- “⚠️ Pre-alert detected – fairness dropping”
+- “🚨 Bias detected – below threshold”
+
+9️⃣ Final polish
+- Test all endpoints
+- Ensure trend and alert components auto-refresh every 30 seconds
+- Add small footer note “Predictive Monitoring Active”
+
+Goal:
+Make frontend reflect the new backend intelligence (trend analysis, alerts, blockchain, and role access).
+Do not remove existing fairness check UI. Only extend it.
