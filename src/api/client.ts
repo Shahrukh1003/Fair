@@ -1,5 +1,16 @@
 import axios from 'axios';
-import type { FairnessCheckResponse, HealthStatus, AuditLogEntry, MonitorParams } from '../types/fairness';
+import type { 
+  FairnessCheckResponse, 
+  HealthStatus, 
+  AuditLogEntry, 
+  MonitorParams,
+  LoginRequest,
+  LoginResponse,
+  FairnessTrendResponse,
+  PreAlertResponse,
+  DriftPrediction,
+  BlockchainAnchor
+} from '../types/fairness';
 
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
@@ -7,6 +18,48 @@ const getApiBaseUrl = () => {
     return `${protocol}//${hostname}:8000/api`;
   }
   return 'http://localhost:8000/api';
+};
+
+export const TOKEN_KEY = 'fairlens_auth_token';
+export const ROLE_KEY = 'fairlens_user_role';
+
+export const authUtils = {
+  getToken: (): string | null => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(TOKEN_KEY);
+    }
+    return null;
+  },
+
+  setToken: (token: string): void => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(TOKEN_KEY, token);
+    }
+  },
+
+  getRole: (): string | null => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(ROLE_KEY);
+    }
+    return null;
+  },
+
+  setRole: (role: string): void => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(ROLE_KEY, role);
+    }
+  },
+
+  clearAuth: (): void => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(ROLE_KEY);
+    }
+  },
+
+  isAuthenticated: (): boolean => {
+    return !!authUtils.getToken();
+  },
 };
 
 const apiClient = axios.create({
@@ -17,7 +70,20 @@ const apiClient = axios.create({
   },
 });
 
+apiClient.interceptors.request.use((config) => {
+  const token = authUtils.getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export const fairnessApi = {
+  login: async (request: LoginRequest): Promise<LoginResponse> => {
+    const response = await apiClient.post<LoginResponse>('/login', request);
+    return response.data;
+  },
+
   checkHealth: async (): Promise<HealthStatus> => {
     const response = await apiClient.get<HealthStatus>('/health');
     return response.data;
@@ -38,6 +104,26 @@ export const fairnessApi = {
       params: { last_n: lastN },
     });
     return response.data.entries;
+  },
+
+  getFairnessTrend: async (): Promise<FairnessTrendResponse> => {
+    const response = await apiClient.get<FairnessTrendResponse>('/fairness_trend');
+    return response.data;
+  },
+
+  getPreAlert: async (): Promise<PreAlertResponse> => {
+    const response = await apiClient.get<PreAlertResponse>('/pre_alert');
+    return response.data;
+  },
+
+  predictDrift: async (): Promise<DriftPrediction> => {
+    const response = await apiClient.get<DriftPrediction>('/predict_fairness_drift');
+    return response.data;
+  },
+
+  getBlockchainAnchor: async (hash: string): Promise<BlockchainAnchor> => {
+    const response = await apiClient.get<BlockchainAnchor>(`/get_anchor/${hash}`);
+    return response.data;
   },
 };
 
