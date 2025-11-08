@@ -1,0 +1,107 @@
+You’re upgrading the FairLens frontend (~/workspace/fairlens-frontend) to visually represent backend data in a live, animated dashboard for the hackathon.
+
+-------------------------------------------------------
+🏗️ 1️⃣ Setup Visualization
+-------------------------------------------------------
+Install dependencies:
+npm install recharts framer-motion react-toastify
+
+-------------------------------------------------------
+📊 2️⃣ FairnessTrend.jsx (new file)
+-------------------------------------------------------
+Purpose:
+Display real-time fairness drift trends using Recharts.
+
+Implement:
+- Fetch from /api/fairness_trend every 30 seconds.
+- Show:
+  - LineChart (x=timestamp, y=DIR value)
+  - Average DIR display on top.
+  - Trend label (“Up”, “Stable”, “Down”) with color badges:
+      Green → Up
+      Yellow → Stable
+      Red → Down
+- Use motion.div from framer-motion to fade in/out when new data appears.
+
+-------------------------------------------------------
+⚠️ 3️⃣ AlertsPanel.jsx (new file)
+-------------------------------------------------------
+Purpose:
+Show bias status and predictive warnings.
+
+Implement:
+- Fetch from /api/pre_alert and /api/predict_fairness_drift.
+- Use colored cards:
+  🟢 “Fairness Stable”
+  🟡 “Pre-Alert: Fairness Degrading”
+  🔴 “Bias Detected”
+- Add pulse animation for red alert using framer-motion.
+- Include “Last checked: timestamp”.
+
+-------------------------------------------------------
+🔑 4️⃣ Login.jsx (new file)
+-------------------------------------------------------
+Purpose:
+Simulate secure access for monitor/auditor/admin roles.
+
+Implement:
+- Role dropdown (monitor, auditor, admin)
+- On submit → POST /api/login
+- Save returned token to localStorage.
+- Navigate to /dashboard if successful.
+- Show Toastify popup “✅ Login successful”.
+
+-------------------------------------------------------
+📋 5️⃣ AuditLog.jsx (new file)
+-------------------------------------------------------
+Purpose:
+Fetch and display audit logs (auth required).
+
+Implement:
+- Fetch /api/audit_history with Authorization: Bearer token
+- Display in table: Record ID, Timestamp, DIR, Alert, Hash
+- Add “Verify” button for each log → fetch /api/verify_alert/<record_id>
+- Show modal popup with verification result.
+
+-------------------------------------------------------
+🔗 6️⃣ BlockchainAudit.jsx (new file)
+-------------------------------------------------------
+Purpose:
+Simulate blockchain anchoring verification.
+
+Implement:
+- Input field for hash.
+- On submit → call /api/get_anchor/<hash>
+- Display fake transaction ID in styled card.
+- Add fade-in animation for result.
+
+-------------------------------------------------------
+🧠 7️⃣ Update App.jsx and Routing
+-------------------------------------------------------
+Add routes:
+- /login → Login.jsx
+- /dashboard → existing main dashboard
+- /audit → AuditLog.jsx
+- /trend → FairnessTrend.jsx
+- /blockchain → BlockchainAudit.jsx
+
+Show navigation bar with role-based links (audit only visible for auditors, blockchain for admin).
+
+-------------------------------------------------------
+🎨 8️⃣ Dashboard Enhancements
+-------------------------------------------------------
+In main Dashboard.jsx:
+- Import AlertsPanel and FairnessTrend
+- Display them side by side using grid
+- Add smooth framer-motion transitions
+- Add color-coded metric cards:
+  - “DIR Value”
+  - “Trend Status”
+  - “Alert Count”
+
+Add Toast notifications when fairness crosses thresholds.
+
+-------------------------------------------------------
+💾 9️⃣ API Integration
+-------------------------------------------------------
+Use api.js helper file:
