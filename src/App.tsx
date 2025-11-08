@@ -9,8 +9,8 @@ import {
   CircularProgress,
   Alert,
   Snackbar,
+  Stack,
 } from '@mui/material';
-import Grid2 from '@mui/material/Unstable_Grid2';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import AssessmentIcon from '@mui/icons-material/Assessment';
@@ -27,10 +27,136 @@ const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#1976d2',
+      main: '#0f172a', // Deep slate for professional look
+      light: '#334155',
+      dark: '#020617',
     },
     secondary: {
-      main: '#dc004e',
+      main: '#6366f1', // Indigo accent
+      light: '#818cf8',
+      dark: '#4f46e5',
+    },
+    error: {
+      main: '#ef4444',
+      light: '#f87171',
+      dark: '#dc2626',
+    },
+    warning: {
+      main: '#f59e0b',
+      light: '#fbbf24',
+      dark: '#d97706',
+    },
+    success: {
+      main: '#10b981',
+      light: '#34d399',
+      dark: '#059669',
+    },
+    info: {
+      main: '#3b82f6',
+      light: '#60a5fa',
+      dark: '#2563eb',
+    },
+    background: {
+      default: '#f1f5f9',
+      paper: '#ffffff',
+    },
+    text: {
+      primary: '#0f172a',
+      secondary: '#64748b',
+    },
+  },
+  typography: {
+    fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif',
+    h4: {
+      fontWeight: 700,
+      letterSpacing: '-0.02em',
+    },
+    h5: {
+      fontWeight: 700,
+      letterSpacing: '-0.01em',
+    },
+    h6: {
+      fontWeight: 600,
+      letterSpacing: '-0.01em',
+    },
+    subtitle1: {
+      fontWeight: 500,
+      letterSpacing: '-0.01em',
+    },
+    body1: {
+      letterSpacing: '-0.01em',
+    },
+    button: {
+      fontWeight: 600,
+      textTransform: 'none',
+      letterSpacing: '-0.01em',
+    },
+  },
+  shape: {
+    borderRadius: 16,
+  },
+  shadows: [
+    'none',
+    '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+    '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+    '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+    '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+    '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+    '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+  ] as const,
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          padding: '10px 24px',
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+          },
+        },
+        contained: {
+          background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+          '&:hover': {
+            background: 'linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)',
+          },
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+          boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+          border: '1px solid rgba(226, 232, 240, 0.8)',
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          fontWeight: 600,
+        },
+      },
     },
   },
 });
@@ -58,7 +184,7 @@ function DashboardContent() {
   const handleRunCheck = (samples: number, drift: number) => {
     setNSamples(samples);
     setDriftLevel(drift);
-    
+
     monitorMutation.mutate(
       { n_samples: samples, drift_level: drift },
       {
@@ -67,8 +193,8 @@ function DashboardContent() {
           refetchAudit();
           setSnackbar({
             open: true,
-            message: data.drifted_scenario.dir_alert 
-              ? 'Bias detected! Check the alert details below.' 
+            message: data.drifted_scenario.dir_alert
+              ? 'Bias detected! Check the alert details below.'
               : 'Check complete. System is operating fairly.',
             severity: data.drifted_scenario.dir_alert ? 'error' : 'success',
           });
@@ -94,46 +220,241 @@ function DashboardContent() {
   }, [autoRefresh, nSamples, driftLevel]);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'grey.50' }}>
-      <AppBar position="static" elevation={2}>
-        <Toolbar>
-          <AssessmentIcon sx={{ mr: 2 }} />
-          <Typography variant="h5" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-            FairLens Fairness Drift Alert System
-          </Typography>
-          {health && (
-            <Typography variant="body2" sx={{ 
-              bgcolor: 'success.dark', 
-              px: 2, 
-              py: 0.5, 
-              borderRadius: 1 
+    <Box sx={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      minHeight: '100vh', 
+      bgcolor: 'background.default',
+      backgroundImage: `
+        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 40%)
+      `,
+      position: 'relative',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '400px',
+        background: 'linear-gradient(180deg, rgba(99, 102, 241, 0.03) 0%, transparent 100%)',
+        pointerEvents: 'none',
+      }
+    }}>
+      <AppBar 
+        position="static" 
+        elevation={0} 
+        sx={{ 
+          background: 'rgba(15, 23, 42, 0.8)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+          animation: 'slideInLeft 0.6s ease-out',
+        }}
+      >
+        <Toolbar sx={{ py: 1.5, px: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1 }}>
+            <Box sx={{ 
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+              p: 1.5, 
+              borderRadius: 3,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.5), 0 0 40px rgba(99, 102, 241, 0.2)',
+              animation: 'float 3s ease-in-out infinite, glow 2s ease-in-out infinite',
+              position: 'relative',
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                inset: -2,
+                borderRadius: 3,
+                background: 'linear-gradient(135deg, #6366f1, #8b5cf6, #6366f1)',
+                backgroundSize: '200% 200%',
+                animation: 'gradientShift 3s ease infinite',
+                opacity: 0.3,
+                filter: 'blur(8px)',
+                zIndex: -1,
+              }
             }}>
-              ● API Online
-            </Typography>
+              <AssessmentIcon sx={{ fontSize: 32, color: 'white' }} />
+            </Box>
+            <Box>
+              <Typography 
+                variant="h5" 
+                component="div" 
+                sx={{ 
+                  fontWeight: 900, 
+                  letterSpacing: '-0.03em',
+                  background: 'linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%)',
+                  backgroundSize: '200% 200%',
+                  animation: 'gradientShift 4s ease infinite',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  textShadow: '0 0 30px rgba(255, 255, 255, 0.3)',
+                }}
+              >
+                FairLens
+              </Typography>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.7)', 
+                  display: 'block', 
+                  mt: -0.5,
+                  fontWeight: 500,
+                  letterSpacing: '0.05em',
+                  textTransform: 'uppercase',
+                  fontSize: '0.7rem',
+                }}
+              >
+                AI Fairness Monitoring Platform
+              </Typography>
+            </Box>
+          </Box>
+          {health && (
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              background: 'rgba(16, 185, 129, 0.15)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              px: 3,
+              py: 1,
+              borderRadius: 3,
+              boxShadow: '0 4px 20px rgba(16, 185, 129, 0.3)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              animation: 'slideInRight 0.6s ease-out',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                background: 'rgba(16, 185, 129, 0.25)',
+                transform: 'translateY(-2px)',
+                boxShadow: '0 6px 25px rgba(16, 185, 129, 0.4)',
+              }
+            }}>
+              <Box sx={{ 
+                width: 10, 
+                height: 10, 
+                borderRadius: '50%', 
+                bgcolor: '#10b981',
+                boxShadow: '0 0 15px rgba(16, 185, 129, 0.8), 0 0 30px rgba(16, 185, 129, 0.4)',
+                animation: 'pulse 2s infinite'
+              }} />
+              <Typography variant="body2" sx={{ fontWeight: 700, color: 'white', letterSpacing: '-0.01em' }}>
+                System Online
+              </Typography>
+            </Box>
           )}
         </Toolbar>
       </AppBar>
 
       <Container maxWidth="xl" sx={{ mt: 4, mb: 4, flexGrow: 1 }}>
-        <Paper elevation={0} sx={{ p: 2, mb: 3, bgcolor: 'info.50', borderLeft: 4, borderColor: 'info.main' }}>
-          <Typography variant="body2" color="text.secondary">
-            <strong>For Non-Technical Administrators:</strong> This dashboard helps you monitor fairness in loan approval decisions. 
-            A <strong>DIR (Disparate Impact Ratio)</strong> below 0.8 means there may be unfair bias against female applicants. 
-            The system automatically checks for bias and alerts you when action is needed.
-          </Typography>
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: 3.5, 
+            mb: 4, 
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            border: '1px solid rgba(99, 102, 241, 0.2)',
+            borderRadius: 4,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+            animation: 'fadeIn 0.8s ease-out',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-4px)',
+              boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
+              border: '1px solid rgba(99, 102, 241, 0.4)',
+            },
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: '6px',
+              background: 'linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%)',
+              boxShadow: '0 0 20px rgba(99, 102, 241, 0.5)',
+            }
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+            <Box sx={{
+              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)',
+              p: 1.5,
+              borderRadius: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid rgba(99, 102, 241, 0.2)',
+              boxShadow: '0 4px 12px rgba(99, 102, 241, 0.15)',
+              animation: 'scaleIn 0.5s ease-out',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'scale(1.1) rotate(5deg)',
+                boxShadow: '0 6px 20px rgba(99, 102, 241, 0.25)',
+              }
+            }}>
+              <Typography sx={{ fontSize: '2rem', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}>⚖️</Typography>
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography 
+                variant="subtitle1" 
+                sx={{ 
+                  fontWeight: 700, 
+                  color: 'primary.main',
+                  mb: 1,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                Ethical AI Monitoring Dashboard
+              </Typography>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  lineHeight: 1.8, 
+                  color: 'text.secondary',
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                This platform continuously monitors AI fairness in loan approval decisions using the <strong>EEOC 80% rule</strong>.
+                A <strong>DIR (Disparate Impact Ratio)</strong> below 0.8 indicates potential bias.
+                The system provides predictive alerts, tamper-proof audit trails, and actionable insights for compliance teams.
+              </Typography>
+            </Box>
+          </Box>
         </Paper>
 
-        <Grid2 container spacing={3}>
-          <Grid2 size={{ xs: 12, lg: 4 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: { xs: 'column', lg: 'row' }, 
+          gap: 3,
+          animation: 'fadeIn 1s ease-out',
+        }}>
+          <Box sx={{ 
+            width: { xs: '100%', lg: '350px' }, 
+            flexShrink: 0,
+            animation: 'slideInLeft 0.8s ease-out',
+          }}>
             <ControlPanel
               onRunCheck={handleRunCheck}
               isLoading={monitorMutation.isPending}
               autoRefresh={autoRefresh}
               onAutoRefreshToggle={setAutoRefresh}
             />
-          </Grid2>
+          </Box>
 
-          <Grid2 size={{ xs: 12, lg: 8 }}>
+          <Box sx={{ 
+            flexGrow: 1,
+            animation: 'slideInRight 0.8s ease-out',
+          }}>
             {monitorMutation.isPending && (
               <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
                 <CircularProgress size={60} />
@@ -152,38 +473,16 @@ function DashboardContent() {
             )}
 
             {lastResult && !monitorMutation.isPending && (
-              <Box>
+              <Stack spacing={3}>
                 <AlertPanel scenario={lastResult.drifted_scenario} />
-                <Box sx={{ mt: 3 }}>
-                  <MetricsOverview scenario={lastResult.drifted_scenario} />
-                </Box>
+                <MetricsOverview scenario={lastResult.drifted_scenario} />
                 {lastResult.fair_scenario && (
-                  <Box sx={{ mt: 3 }}>
-                    <MetricsOverview scenario={lastResult.fair_scenario} isFair />
-                  </Box>
+                  <MetricsOverview scenario={lastResult.fair_scenario} isFair />
                 )}
-              </Box>
+              </Stack>
             )}
-          </Grid2>
 
-          {lastResult && auditHistory && auditHistory.length > 0 && (
-            <>
-              <Grid2 size={{ xs: 12 }}>
-                <ChartsSection
-                  fairScenario={lastResult.fair_scenario}
-                  driftedScenario={lastResult.drifted_scenario}
-                  auditHistory={auditHistory}
-                />
-              </Grid2>
-
-              <Grid2 size={{ xs: 12 }}>
-                <AuditLogTable entries={auditHistory} />
-              </Grid2>
-            </>
-          )}
-
-          {!lastResult && (
-            <Grid2 size={{ xs: 12 }}>
+            {!lastResult && !monitorMutation.isPending && (
               <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'grey.50' }}>
                 <Typography variant="h6" color="text.secondary" gutterBottom>
                   No fairness check has been run yet
@@ -192,25 +491,83 @@ function DashboardContent() {
                   Use the controls on the left to configure and run your first fairness check
                 </Typography>
               </Paper>
-            </Grid2>
-          )}
-        </Grid2>
+            )}
+          </Box>
+        </Box>
+
+        {lastResult && auditHistory && auditHistory.length > 0 && (
+          <Stack spacing={3} sx={{ mt: 3 }}>
+            <ChartsSection
+              fairScenario={lastResult.fair_scenario}
+              driftedScenario={lastResult.drifted_scenario}
+              auditHistory={auditHistory}
+            />
+            <AuditLogTable entries={auditHistory} />
+          </Stack>
+        )}
       </Container>
 
       <Box
         component="footer"
         sx={{
-          py: 2,
+          py: 4,
           px: 2,
           mt: 'auto',
-          bgcolor: 'grey.200',
-          borderTop: 1,
-          borderColor: 'divider',
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
         }}
       >
-        <Typography variant="body2" color="text.secondary" align="center">
-          FairLens v1.0.0 | Ensuring Fair Lending Practices | EEOC 80% Rule Compliance
-        </Typography>
+        <Container maxWidth="xl">
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            flexWrap: 'wrap', 
+            gap: 3 
+          }}>
+            <Box>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontWeight: 600,
+                  mb: 0.5,
+                }}
+              >
+                FairLens v2.0.0
+              </Typography>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  display: 'block',
+                }}
+              >
+                Ensuring Fair Lending Practices Through AI Monitoring
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'right' }}>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  display: 'block',
+                  mb: 0.5,
+                }}
+              >
+                EEOC 80% Rule Compliance | Predictive Monitoring
+              </Typography>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.5)',
+                }}
+              >
+                © 2025 FairLens. Built for Ethical AI in Banking.
+              </Typography>
+            </Box>
+          </Box>
+        </Container>
       </Box>
 
       <Snackbar
@@ -219,8 +576,8 @@ function DashboardContent() {
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert 
-          onClose={() => setSnackbar({ ...snackbar, open: false })} 
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity}
           variant="filled"
         >

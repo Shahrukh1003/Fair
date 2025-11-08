@@ -14,11 +14,29 @@ export const AlertPanel = ({ scenario }: AlertPanelProps) => {
 
   if (!scenario.dir_alert) {
     return (
-      <Alert severity="success" icon={false} sx={{ mb: 2 }}>
-        <Typography variant="h6" gutterBottom>
+      <Alert 
+        severity="success" 
+        icon={false} 
+        sx={{ 
+          borderRadius: 4,
+          border: '1px solid',
+          borderColor: 'success.main',
+          background: 'rgba(16, 185, 129, 0.1)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          boxShadow: '0 8px 32px rgba(16, 185, 129, 0.15)',
+          animation: 'scaleIn 0.5s ease-out',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 12px 40px rgba(16, 185, 129, 0.2)',
+          }
+        }}
+      >
+        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: 'success.dark' }}>
           ✓ No Bias Detected
         </Typography>
-        <Typography variant="body2">
+        <Typography variant="body2" sx={{ color: 'success.dark' }}>
           The system is operating fairly. The Disparate Impact Ratio ({scenario.dir.toFixed(3)}) meets or exceeds the EEOC 80% rule threshold.
         </Typography>
       </Alert>
@@ -26,13 +44,36 @@ export const AlertPanel = ({ scenario }: AlertPanelProps) => {
   }
 
   return (
-    <Card elevation={3} sx={{ borderLeft: 4, borderColor: 'error.main' }}>
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-          <Typography variant="h6" color="error">
+    <Card 
+      elevation={0}
+      sx={{ 
+        borderLeft: 6, 
+        borderColor: 'error.main',
+        borderRadius: 4,
+        background: 'rgba(239, 68, 68, 0.1)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        border: '1px solid rgba(239, 68, 68, 0.3)',
+        boxShadow: '0 8px 32px rgba(239, 68, 68, 0.15)',
+        animation: 'scaleIn 0.5s ease-out',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: '0 12px 40px rgba(239, 68, 68, 0.2)',
+        }
+      }}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+          <Typography variant="h6" color="error" sx={{ fontWeight: 700 }}>
             ⚠ Bias Alert
           </Typography>
-          <Chip label="Action Required" color="error" size="small" />
+          <Chip 
+            label="Action Required" 
+            color="error" 
+            size="small"
+            sx={{ fontWeight: 600 }}
+          />
         </Box>
 
         {scenario.explanation && (

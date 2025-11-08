@@ -24,8 +24,21 @@ const MetricCard = ({
   color?: string;
   tooltip?: string;
 }) => (
-  <Card elevation={2} sx={{ height: '100%' }}>
-    <CardContent>
+  <Card 
+    elevation={0} 
+    sx={{ 
+      height: '100%',
+      border: '1px solid',
+      borderColor: 'divider',
+      borderRadius: 2,
+      transition: 'all 0.2s',
+      '&:hover': {
+        boxShadow: 2,
+        borderColor: 'primary.main',
+      }
+    }}
+  >
+    <CardContent sx={{ p: 2.5 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
         <Typography variant="body2" color="text.secondary">
           {title}
@@ -57,17 +70,34 @@ export const MetricsOverview = ({ scenario, isFair = false }: MetricsOverviewPro
   );
 
   return (
-    <Card elevation={3}>
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="h6">
-            {isFair ? 'Fair Baseline Scenario' : 'Current Scenario Metrics'}
+    <Card 
+      elevation={0}
+      sx={{ 
+        borderRadius: 4,
+        background: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        border: '1px solid rgba(255, 255, 255, 0.3)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+        transition: 'all 0.3s ease',
+        animation: 'fadeIn 0.6s ease-out',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
+        }
+      }}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            {isFair ? '📊 Fair Baseline Scenario' : '📈 Current Scenario Metrics'}
           </Typography>
           <Chip
             icon={alertIcon}
             label={scenario.dir_alert ? 'Bias Detected' : 'Fair'}
             color={getAlertColor(scenario.dir_alert)}
             variant="filled"
+            sx={{ fontWeight: 600 }}
           />
         </Box>
 

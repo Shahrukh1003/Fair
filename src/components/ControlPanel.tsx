@@ -32,14 +32,53 @@ export const ControlPanel = ({ onRunCheck, isLoading, autoRefresh, onAutoRefresh
   };
 
   return (
-    <Card elevation={3}>
-      <CardContent>
-        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <PlayArrowIcon color="primary" />
+    <Card 
+      elevation={0}
+      sx={{ 
+        borderRadius: 4, 
+        overflow: 'hidden',
+        background: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        border: '1px solid rgba(255, 255, 255, 0.3)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
+        }
+      }}
+    >
+      <Box sx={{ 
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        color: 'white', 
+        p: 2.5,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%)',
+        }
+      }}>
+        <PlayArrowIcon sx={{ 
+          fontSize: 28,
+          filter: 'drop-shadow(0 2px 8px rgba(99, 102, 241, 0.5))',
+        }} />
+        <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: '-0.01em', position: 'relative' }}>
           Fairness Check Controls
         </Typography>
+      </Box>
+      <CardContent sx={{ p: 3 }}>
         
-        <Stack spacing={3} sx={{ mt: 2 }}>
+        <Stack spacing={3}>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <Typography variant="body2" fontWeight="medium">
@@ -106,7 +145,17 @@ export const ControlPanel = ({ onRunCheck, isLoading, autoRefresh, onAutoRefresh
               onClick={handleRunCheck}
               disabled={isLoading}
               fullWidth
-              sx={{ flexGrow: 1 }}
+              sx={{ 
+                flexGrow: 1,
+                py: 1.5,
+                fontWeight: 600,
+                boxShadow: 2,
+                '&:hover': {
+                  boxShadow: 4,
+                  transform: 'translateY(-1px)',
+                },
+                transition: 'all 0.2s'
+              }}
             >
               {isLoading ? 'Running Check...' : 'Run Fairness Check'}
             </Button>

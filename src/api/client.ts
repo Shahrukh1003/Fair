@@ -34,10 +34,10 @@ export const fairnessApi = {
   },
 
   getAuditHistory: async (lastN: number = 20): Promise<AuditLogEntry[]> => {
-    const response = await apiClient.get<AuditLogEntry[]>('/audit_history', {
+    const response = await apiClient.get<{ entries: AuditLogEntry[]; count: number }>('/audit_history', {
       params: { last_n: lastN },
     });
-    return response.data;
+    return response.data.entries;
   },
 };
 

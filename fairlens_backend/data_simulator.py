@@ -91,12 +91,14 @@ def generate_loan_data(n_samples: int, drift_level: float, seed: int = 42) -> pd
     ).astype(int)
     
     # Generate approval decisions based on group-specific rates
+    # Generate all random numbers at once for consistency
+    random_values = np.random.rand(n_samples)
     approvals = []
-    for gender in genders:
+    for i, gender in enumerate(genders):
         if gender == 'Female':
-            approved = np.random.rand() < female_approval_rate
+            approved = random_values[i] < female_approval_rate
         else:  # Male
-            approved = np.random.rand() < male_approval_rate
+            approved = random_values[i] < male_approval_rate
         approvals.append(approved)
     
     # Construct DataFrame

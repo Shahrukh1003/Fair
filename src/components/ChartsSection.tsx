@@ -48,10 +48,39 @@ export const ChartsSection = ({ fairScenario, driftedScenario, auditHistory }: C
     }));
 
   return (
-    <Card elevation={3}>
-      <CardContent>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-          <Tabs value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)}>
+    <Card 
+      elevation={0}
+      sx={{ 
+        borderRadius: 4,
+        background: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        border: '1px solid rgba(255, 255, 255, 0.3)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+        animation: 'fadeIn 0.8s ease-out',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
+        }
+      }}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+          📊 Fairness Analytics
+        </Typography>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+          <Tabs
+            value={activeTab}
+            onChange={(_, newValue) => setActiveTab(newValue)}
+            sx={{
+              '& .MuiTab-root': {
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '0.95rem'
+              }
+            }}
+          >
             <Tab label="Approval Rate Comparison" />
             <Tab label="DIR Trend" />
           </Tabs>
@@ -66,11 +95,11 @@ export const ChartsSection = ({ fairScenario, driftedScenario, auditHistory }: C
               <BarChart data={approvalComparisonData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
-                <YAxis 
+                <YAxis
                   label={{ value: 'Approval Rate (%)', angle: -90, position: 'insideLeft' }}
                   domain={[0, 100]}
                 />
-                <RechartsTooltip 
+                <RechartsTooltip
                   formatter={(value: number) => `${value.toFixed(1)}%`}
                 />
                 <Legend />
@@ -94,27 +123,27 @@ export const ChartsSection = ({ fairScenario, driftedScenario, auditHistory }: C
               <LineChart data={dirTrendData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="check" />
-                <YAxis 
+                <YAxis
                   label={{ value: 'DIR Value', angle: -90, position: 'insideLeft' }}
                   domain={[0, 1.2]}
                 />
-                <RechartsTooltip 
+                <RechartsTooltip
                   formatter={(value: number) => value.toFixed(3)}
                   labelFormatter={(label) => `Check ${label}`}
                 />
                 <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="DIR" 
-                  stroke="#8884d8" 
+                <Line
+                  type="monotone"
+                  dataKey="DIR"
+                  stroke="#8884d8"
                   strokeWidth={2}
                   dot={{ r: 4 }}
                   activeDot={{ r: 6 }}
                 />
-                <ReferenceLine 
-                  y={0.8} 
-                  stroke="red" 
-                  strokeDasharray="3 3" 
+                <ReferenceLine
+                  y={0.8}
+                  stroke="red"
+                  strokeDasharray="3 3"
                   label={{ value: 'EEOC Threshold (0.8)', position: 'right' }}
                 />
               </LineChart>

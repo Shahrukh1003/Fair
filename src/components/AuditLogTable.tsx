@@ -36,14 +36,32 @@ export const AuditLogTable = ({ entries }: AuditLogTableProps) => {
   const paginatedEntries = entries.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
-    <Card elevation={3}>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          Compliance Audit Log
-        </Typography>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          Immutable record of all fairness checks for regulatory compliance
-        </Typography>
+    <Card 
+      elevation={0}
+      sx={{ 
+        borderRadius: 4,
+        background: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        border: '1px solid rgba(255, 255, 255, 0.3)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+        animation: 'fadeIn 1s ease-out',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
+        }
+      }}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
+            📋 Compliance Audit Log
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Immutable record of all fairness checks for regulatory compliance
+          </Typography>
+        </Box>
 
         <TableContainer sx={{ mt: 2 }}>
           <Table size="small">
