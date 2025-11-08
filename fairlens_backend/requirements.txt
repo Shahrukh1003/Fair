@@ -1,0 +1,8 @@
+flask==3.1.2
+flask-cors==6.0.1
+pandas==2.2.3
+numpy==2.2.1
+cryptography==46.0.3
+streamlit==1.41.1
+plotly==6.4.0
+requests==2.32.3
