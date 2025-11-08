@@ -1,0 +1,124 @@
+Your task: Upgrade the FairLens backend (Flask + Python) from basic fairness checker to full-featured AI Fairness Drift Monitoring backend.
+
+Project path: ~/workspace/fairlens_backend
+
+Current files:
+- app.py
+- compliance_logger.py
+- data_simulator.py
+- fairness_metrics.py
+- explainability_module.py
+- security_utils.py
+- requirements.txt
+
+Goal:
+Implement all advanced backend features as described below, without breaking existing APIs.  
+Keep all imports clean, organized, and commented.  
+Add necessary new files and update app.py accordingly.
+
+-------------------------------------------------------
+🧱 NEW FILES TO ADD / UPDATE
+-------------------------------------------------------
+
+1️⃣ trend_analyzer.py  
+• Create SQLite database (`fairness_trends.db`)  
+• Table: trends (id, timestamp, dir_value, alert_status)  
+• Functions:
+  - init_db(): create table if not exists
+  - log_trend(dir_value, alert_status): insert new record
+  - get_recent_trend(window=10): return last 10 dir values and average
+  - check_pre_alert(threshold=0.8): return “PRE-ALERT” if average DIR trending down but still >= 0.8
+
+2️⃣ fairness_trend.py  
+• Import get_recent_trend  
+• Function predict_fairness_drift():
+   - Compute slope between first and last DIR value
+   - If slope < -0.05, return warning dict
+   - Else return stable
+
+3️⃣ compliance_logger.py (update existing file)
+• Add SHA256 hashing for each alert:
+   - Compute hash for event data → store in DB & JSONL
+   - Function verify_alert(record_id) → recompute hash and verify integrity
+• Print “✅ Alert hash verified” message in console
+• Add record_id field and hash_value to every log entry
+
+4️⃣ auth_middleware.py  
+• Simple role-based authentication
+• Tokens:
+    MONITOR123 → monitor
+    AUDITOR123 → auditor
+    ADMIN123 → admin
+• Functions:
+   - verify_token(role, token)
+   - decorator require_role(role)
+   - POST /api/login → returns token for selected role
+
+5️⃣ blockchain_anchor.py  
+• Simulate blockchain anchor system
+• Functions:
+   - anchor_to_blockchain(record_hash): generate fake tx_id = "0x" + hash[:16]
+   - log tx_id + hash in blockchain_anchors.jsonl
+   - get_anchor(record_hash): return tx_id for that hash
+
+6️⃣ app.py (update main Flask app)
+• Import all new modules
+• Initialize DB with trend_analyzer.init_db() at startup
+• Add endpoints:
+  - GET  /api/health  → returns status
+  - GET  /api/fairness_trend  → calls get_recent_trend()
+  - GET  /api/pre_alert  → calls check_pre_alert()
+  - GET  /api/predict_fairness_drift → calls predict_fairness_drift()
+  - GET  /api/verify_alert/<record_id> → calls verify_alert()
+  - GET  /api/get_anchor/<hash> → calls get_anchor()
+  - POST /api/submit_predictions → accepts predictions JSON, calculates fairness, logs results
+  - POST /api/login → returns token per role
+• Protect /api/audit_history with @require_role("auditor")
+
+7️⃣ db_manager.py (optional helper)
+• Handles DB connection reuse
+
+-------------------------------------------------------
+⚙️ REQUIREMENTS UPDATE
+-------------------------------------------------------
+Add to requirements.txt:
+flask
+flask-cors
+cryptography
+pandas
+numpy
+sqlalchemy
+requests
+
+-------------------------------------------------------
+🧪 TESTING
+-------------------------------------------------------
+After build, ensure these commands work:
+
+python3 fairlens_backend/app.py
+curl "http://127.0.0.1:5000/api/health"
+curl "http://127.0.0.1:5000/api/fairness_trend"
+curl "http://127.0.0.1:5000/api/predict_fairness_drift"
+curl -X POST http://127.0.0.1:5000/api/login -H "Content-Type: application/json" -d '{"role":"auditor"}'
+curl "http://127.0.0.1:5000/api/audit_history" -H "Authorization: Bearer AUDITOR123"
+
+-------------------------------------------------------
+✅ EXPECTED OUTPUT AFTER SUCCESSFUL BUILD
+-------------------------------------------------------
+Console shows:
+“✅ All modules loaded: Trend Analyzer, Fingerprinting, RBAC, Blockchain Anchoring.”
+
+API endpoints respond:
+- /api/health → {“status”: “FairLens backend running”}
+- /api/predict_fairness_drift → returns trend and warning
+- /api/get_anchor/<hash> → returns simulated tx_id
+- /api/verify_alert/<record_id> → returns verification true/false
+- /api/audit_history → returns encrypted audit logs (auth required)
+- /api/submit_predictions → computes fairness dynamically
+
+-------------------------------------------------------
+FINAL NOTE
+-------------------------------------------------------
+Do not modify existing fairness logic or encryption functions.  
+Integrate new modules modularly.  
+Add explanatory docstrings and print logs for every major process.
