@@ -10,7 +10,6 @@ import {
   Alert,
   Snackbar,
   Stack,
-  Button,
   IconButton,
   Menu,
   MenuItem,
@@ -192,10 +191,11 @@ function DashboardContent() {
   const navigate = useNavigate();
 
   const monitorMutation = useMonitorMutation();
-  const { data: auditHistory, refetch: refetchAudit } = useAuditHistory(20);
   const { data: health } = useHealthCheck();
-  
   const userRole = authUtils.getRole();
+  
+  const isAuditorOrAdmin = userRole === 'auditor' || userRole === 'admin';
+  const { data: auditHistory, refetch: refetchAudit } = useAuditHistory(20, isAuditorOrAdmin);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -220,12 +220,14 @@ function DashboardContent() {
       {
         onSuccess: (data) => {
           setLastResult(data);
-          refetchAudit();
+          if (isAuditorOrAdmin) {
+            refetchAudit();
+          }
           setSnackbar({
             open: true,
             message: data.drifted_scenario.dir_alert
-              ? 'Bias detected! Check the alert details below.'
-              : 'Check complete. System is operating fairly.',
+              ? '🚨 Bias detected! Check the alert details below.'
+              : '✅ Check complete. System is operating fairly.',
             severity: data.drifted_scenario.dir_alert ? 'error' : 'success',
           });
         },
@@ -563,15 +565,19 @@ function DashboardContent() {
           </Box>
         </Box>
 
-        {lastResult && auditHistory && auditHistory.length > 0 && (
+        {lastResult && (
           <Stack spacing={3} sx={{ mt: 3 }}>
-            <ChartsSection
-              fairScenario={lastResult.fair_scenario}
-              driftedScenario={lastResult.drifted_scenario}
-              auditHistory={auditHistory}
-            />
-            <AuditLogTable entries={auditHistory} />
-            <BlockchainAudit />
+            {isAuditorOrAdmin && auditHistory && auditHistory.length > 0 && (
+              <>
+                <ChartsSection
+                  fairScenario={lastResult.fair_scenario}
+                  driftedScenario={lastResult.drifted_scenario}
+                  auditHistory={auditHistory}
+                />
+                <AuditLogTable entries={auditHistory} />
+                <BlockchainAudit />
+              </>
+            )}
           </Stack>
         )}
       </Container>

@@ -22,11 +22,12 @@ export const useMonitorMutation = () => {
   });
 };
 
-export const useAuditHistory = (lastN: number = 20) => {
+export const useAuditHistory = (lastN: number = 20, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['audit-history', lastN],
     queryFn: () => fairnessApi.getAuditHistory(lastN),
     refetchInterval: false,
+    enabled,
   });
 };
 

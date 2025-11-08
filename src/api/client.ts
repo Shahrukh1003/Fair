@@ -78,6 +78,19 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      authUtils.clearAuth();
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const fairnessApi = {
   login: async (request: LoginRequest): Promise<LoginResponse> => {
     const response = await apiClient.post<LoginResponse>('/login', request);
