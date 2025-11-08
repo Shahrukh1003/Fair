@@ -9,7 +9,7 @@ A production-ready fairness monitoring system that detects bias in automated loa
 - **Encrypted Alerts**: Fernet-based encryption for sensitive fairness findings
 - **Compliance Logging**: Immutable JSONL audit trail for regulatory compliance
 - **Statistical Explanations**: Identifies likely causes of detected bias
-- **Interactive Dashboard**: Real-time visualization with Streamlit
+- **Professional React Dashboard**: Modern admin interface with Material UI
 - **REST API**: Flask-based backend for fairness monitoring
 
 ## 📁 Project Structure
@@ -23,11 +23,23 @@ fairlens_backend/
 ├── compliance_logger.py          # Append-only audit logging
 ├── explainability_module.py      # Statistical bias analysis
 ├── app.py                        # Flask REST API
-├── dashboard.py                  # Streamlit dashboard
-├── start_all.py                  # Unified startup script
 ├── requirements.txt              # Python dependencies
 ├── fernet.key                    # Encryption key (generated automatically)
 └── compliance_audit_log.jsonl    # Audit trail (generated at runtime)
+
+src/                               # React frontend source
+├── components/                    # React components
+│   ├── ControlPanel.tsx          # Fairness check controls
+│   ├── MetricsOverview.tsx       # DIR and approval rate metrics
+│   ├── AlertPanel.tsx            # Bias alert display
+│   ├── ChartsSection.tsx         # Trend and comparison charts
+│   └── AuditLogTable.tsx         # Compliance audit log viewer
+├── api/                          # API client
+├── hooks/                        # React Query hooks
+├── types/                        # TypeScript types
+├── utils/                        # Helper functions
+├── App.tsx                       # Main React app
+└── main.tsx                      # React entry point
 ```
 
 ## 🚀 Quick Start
@@ -45,8 +57,9 @@ The system uses two workflows that run automatically:
    - Handles fairness checks, data generation, metrics calculation
    - Endpoints: `/api/monitor_fairness`, `/api/audit_history`, `/api/health`
 
-2. **Streamlit Dashboard** (Port 5000)
-   - Interactive web interface for monitoring and visualization
+2. **React Dashboard** (Port 5000)
+   - Professional admin interface built with React + Material UI
+   - Real-time fairness monitoring and visualization
    - Auto-connects to Flask API on port 8000
 
 Both workflows are configured and running automatically. Access the dashboard through the Replit webview.
@@ -57,8 +70,8 @@ Both workflows are configured and running automatically. Access the dashboard th
 # Start Flask API on port 8000
 FLASK_PORT=8000 python fairlens_backend/app.py
 
-# Start Streamlit Dashboard on port 5000 (in another terminal)
-streamlit run fairlens_backend/dashboard.py --server.port 5000 --server.address 0.0.0.0
+# Start React Dashboard on port 5000 (in another terminal)
+npx vite --port 5000 --host 0.0.0.0
 ```
 
 ## 🔍 How It Works
@@ -153,17 +166,49 @@ Health check endpoint.
 curl "http://127.0.0.1:8000/api/health"
 ```
 
-## 🎨 Dashboard Features
+## 🎨 React Dashboard Features
 
-Access the Streamlit dashboard at the Replit webview URL (port 5000).
+Access the React dashboard at the Replit webview URL (port 5000).
 
-- **Real-time Metrics**: Current DIR, approval rates, bias gap
-- **Alert Status**: Color-coded indicators (🟢 fair, 🔴 bias detected)
-- **Trend Visualization**: DIR evolution across multiple checks
-- **Comparison Charts**: Drifted vs. fair baseline scenarios
-- **Compliance Log Viewer**: Recent audit trail entries
-- **Interactive Controls**: Adjustable drift level and sample size
-- **Auto-refresh**: Optional 10-second auto-refresh mode
+### For Non-Technical Administrators
+
+The dashboard is designed to be intuitive for administrators without technical backgrounds:
+
+- **Clear Terminology**: All technical terms (like DIR) are explained in plain language with helpful tooltips
+- **Color-Coded Alerts**: Green = Fair/Good, Red = Bias/Alert - no need to understand numbers
+- **Visual Explanations**: Charts show trends and comparisons at a glance
+- **Guided Controls**: Sliders and buttons with descriptive labels guide you through running checks
+
+### Dashboard Components
+
+1. **Control Panel** (Left Side)
+   - Adjustable bias drift level (0% = fair, 100% = maximum bias)
+   - Number of loan applications to test (100-2000)
+   - "Run Fairness Check" button to start analysis
+   - Auto-refresh toggle for continuous monitoring
+
+2. **Metrics Overview**
+   - DIR (Disparate Impact Ratio) with color-coded status
+   - Female and male approval rates
+   - Approval rate gap
+   - Each metric includes helpful tooltips explaining what it means
+
+3. **Alert Panel**
+   - Green checkmark when system is operating fairly
+   - Red warning when bias is detected
+   - Plain-language explanation of detected bias
+   - Encrypted alert token for compliance records
+
+4. **Trend Charts**
+   - **Approval Rate Comparison**: Side-by-side bar chart comparing female vs male approval rates
+   - **DIR Trend Over Time**: Line chart showing DIR history with 0.8 threshold line
+   - Tab-based navigation between chart views
+
+5. **Compliance Audit Log**
+   - Sortable, paginated table of all fairness checks
+   - Color-coded status chips (ALERT / FAIR)
+   - Timestamp, DIR value, approval rates for each check
+   - Full regulatory audit trail
 
 ## 🔐 Security & Compliance
 

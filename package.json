@@ -1,0 +1,30 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "A production-ready fairness monitoring system that detects bias in automated loan decisions using the EEOC 80% rule (Disparate Impact Ratio). The system provides real-time monitoring, encrypted alerts, immutable compliance logging, and statistical explanations for detected bias.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.5",
+    "@mui/material": "^7.3.5",
+    "@tanstack/react-query": "^5.90.7",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.1.0",
+    "axios": "^1.13.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.5",
+    "recharts": "^3.3.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.2"
+  }
+}
