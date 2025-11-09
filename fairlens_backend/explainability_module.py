@@ -1,5 +1,5 @@
 """
-Explainability Module for FairLens
+Explainability Module for BiasCheck
 
 Purpose: Generate statistical explanations for detected bias.
 
@@ -18,7 +18,7 @@ For deeper analysis, consider:
 - Fairness-aware feature importance (SHAP, LIME with fairness constraints)
 - Structural equation modeling
 
-How it fits: This is the EXPLAIN step in the FairLens pipeline.
+How it fits: This is the EXPLAIN step in the BiasCheck pipeline.
 Data → Metric → Detect → Alert → Log → Explain → Visualize
 """
 

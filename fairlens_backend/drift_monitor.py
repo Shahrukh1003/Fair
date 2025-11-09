@@ -1,5 +1,5 @@
 """
-Advanced Drift Monitoring for FairLens v3.0
+Advanced Drift Monitoring for BiasCheck v3.0
 Implements predictive drift detection with velocity, acceleration, and confidence intervals
 """
 

@@ -1,5 +1,5 @@
 """
-Blockchain Anchor Module for FairLens
+Blockchain Anchor Module for BiasCheck
 
 Purpose: Simulate anchoring fairness audit hashes to a public blockchain
 for tamper-proof, publicly verifiable compliance evidence.
@@ -8,7 +8,7 @@ This is a demonstration of how fairness logs can be made immutable and
 transparent using blockchain technology. In production, this would connect
 to a real blockchain network like Polygon, Ethereum, or Hyperledger.
 
-How it fits: This is the TRANSPARENCY layer in the FairLens pipeline.
+How it fits: This is the TRANSPARENCY layer in the BiasCheck pipeline.
 Data → Metric → Alert → Log → [Blockchain Anchor] → Public Verification
 """
 

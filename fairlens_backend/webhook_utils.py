@@ -1,5 +1,5 @@
 """
-Webhook & Alert Notification Module for FairLens v3.0
+Webhook & Alert Notification Module for BiasCheck v3.0
 
 Sends real-time alerts when fairness violations are detected.
 Supports Slack webhooks, email notifications, and custom webhooks.
@@ -64,10 +64,10 @@ def send_slack_alert(message: str, metrics: Dict[str, Any], severity: str = 'war
     payload = {
         'attachments': [{
             'color': color,
-            'title': '⚠️ FairLens Fairness Alert',
+            'title': '⚠️ BiasCheck Fairness Alert',
             'text': message,
             'fields': fields,
-            'footer': 'FairLens v3.0 - Predictive Fairness Governance',
+            'footer': 'BiasCheck v3.0 - Predictive Fairness Governance',
             'ts': int(datetime.now().timestamp())
         }]
     }
@@ -124,7 +124,7 @@ def send_email_alert(
         <html>
         <body>
             <h2 style="color: {color};">
-                ⚠️ FairLens Fairness Alert
+                ⚠️ BiasCheck Fairness Alert
             </h2>
             <p><strong>Severity:</strong> {severity.upper()}</p>
             <p>{message}</p>
@@ -134,7 +134,7 @@ def send_email_alert(
                 {metrics_table}
             </table>
             <hr>
-            <p><em>FairLens v3.0 - Predictive Fairness Governance</em></p>
+            <p><em>BiasCheck v3.0 - Predictive Fairness Governance</em></p>
             <p><small>Timestamp: {datetime.now().isoformat()}</small></p>
         </body>
         </html>
@@ -246,7 +246,7 @@ A fairness metric has fallen below the acceptable threshold, indicating potentia
     results = {
         'slack': send_slack_alert(message, metrics, severity),
         'email': send_email_alert(
-            subject=f'🚨 FairLens Alert: {alert_type}',
+            subject=f'🚨 BiasCheck Alert: {alert_type}',
             message=message,
             metrics=metrics,
             severity=severity
@@ -314,7 +314,7 @@ def test_webhook_configuration() -> Dict[str, Any]:
         if SLACK_WEBHOOK_URL:
             results['slack']['test_sent'] = True
             results['slack']['test_passed'] = send_slack_alert(
-                'This is a test alert from FairLens v3.0',
+                'This is a test alert from BiasCheck v3.0',
                 test_metrics,
                 'info'
             )
@@ -322,8 +322,8 @@ def test_webhook_configuration() -> Dict[str, Any]:
         if EMAIL_WEBHOOK_URL:
             results['email']['test_sent'] = True
             results['email']['test_passed'] = send_email_alert(
-                'FairLens Test Alert',
-                'This is a test alert from FairLens v3.0',
+                'BiasCheck Test Alert',
+                'This is a test alert from BiasCheck v3.0',
                 test_metrics,
                 'info'
             )
@@ -332,7 +332,7 @@ def test_webhook_configuration() -> Dict[str, Any]:
             results['custom']['test_sent'] = True
             results['custom']['test_passed'] = send_custom_webhook(
                 'test_alert',
-                {'message': 'Test from FairLens v3.0', 'metrics': test_metrics},
+                {'message': 'Test from BiasCheck v3.0', 'metrics': test_metrics},
                 'info'
             )
     

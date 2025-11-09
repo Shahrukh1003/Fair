@@ -1,11 +1,11 @@
 """
-Fairness Trend Prediction Module for FairLens
+Fairness Trend Prediction Module for BiasCheck
 
 Purpose: Provide predictive analytics for fairness drift detection.
 This module goes beyond reactive monitoring to predict when fairness
 might degrade in the future, enabling proactive intervention.
 
-How it fits: This is the PREDICTIVE ANALYTICS layer in FairLens.
+How it fits: This is the PREDICTIVE ANALYTICS layer in BiasCheck.
 Data → Metric → Detect → Alert → Log → Trend → [Prediction] → Pre-Alert
 """
 

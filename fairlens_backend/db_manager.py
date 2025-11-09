@@ -1,11 +1,11 @@
 """
-Database Manager for FairLens Fairness Monitoring System
+Database Manager for BiasCheck Fairness Monitoring System
 
 Purpose: Manage database for temporal fairness drift tracking with PostgreSQL support.
 This module stores every fairness check result with timestamp, enabling
 trend analysis and predictive drift detection.
 
-How it fits: This is the PERSISTENCE layer in the FairLens pipeline.
+How it fits: This is the PERSISTENCE layer in the BiasCheck pipeline.
 Data → Metric → Detect → Alert → Log → [DB Storage] → Trend Analysis
 
 UPGRADE: Now supports PostgreSQL for production and SQLite for local development

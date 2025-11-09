@@ -1,13 +1,13 @@
 """
-Flask API for FairLens Fairness Drift Alert System
+Flask API for BiasCheck Fairness Drift Alert System
 
-Purpose: Orchestrator that ties together all FairLens modules via REST API endpoints.
+Purpose: Orchestrator that ties together all BiasCheck modules via REST API endpoints.
 
 This Flask application serves as the backend for fairness monitoring, providing:
 - /api/monitor_fairness: Generate data, compute metrics, trigger alerts
 - /api/audit_history: Retrieve compliance audit log
 
-How it fits: This is the ORCHESTRATION layer in the FairLens pipeline.
+How it fits: This is the ORCHESTRATION layer in the BiasCheck pipeline.
 Data → Metric → Detect → Alert → Log → Explain → Visualize
                            ↑                          ↑
                         [THIS API]              Dashboard queries
@@ -75,7 +75,7 @@ encryption_key = init_key()
 init_database()
 
 # Initialize v3.0 components
-logger.info("Initializing FairLens v3.0 components...")
+logger.info("Initializing BiasCheck v3.0 components...")
 model_registry = get_registry()
 metrics_engine = MetricsEngine()
 drift_monitor = DriftMonitor()
@@ -330,7 +330,7 @@ def health_check():
     """Health check endpoint for monitoring and deployment."""
     return jsonify({
         "status": "healthy",
-        "service": "FairLens Fairness Drift Alert System",
+        "service": "BiasCheck Fairness Drift Alert System",
         "version": "1.0.0"
     })
 
@@ -1396,7 +1396,7 @@ def index():
 
 if __name__ == '__main__':
     logger.info("=" * 80)
-    logger.info("FairLens v3.0 - Predictive Fairness Governance Platform")
+    logger.info("BiasCheck v3.0 - Predictive Fairness Governance Platform")
     logger.info("Production-Grade AI Ethics & Compliance Monitoring System")
     logger.info("=" * 80)
     logger.info("")
@@ -1442,7 +1442,7 @@ if __name__ == '__main__':
     logger.info(f"  🎯 MODE: {Config.get_mode_display()}")
     logger.info("")
     logger.info("=" * 80)
-    logger.info("How FairLens v3.0 Works:")
+    logger.info("How BiasCheck v3.0 Works:")
     logger.info("=" * 80)
     logger.info("")
     logger.info("  1. REAL MODEL PREDICTIONS → Live loan approval decisions")
@@ -1465,7 +1465,7 @@ if __name__ == '__main__':
     logger.info("")
     logger.info("=" * 80)
     port = int(os.environ.get('FLASK_PORT', 8000))
-    logger.info(f"✅ FairLens v3.0 – Predictive Fairness Governance Active")
+    logger.info(f"✅ BiasCheck v3.0 – Predictive Fairness Governance Active")
     logger.info(f"   API running on http://127.0.0.1:{port}")
     logger.info("=" * 80)
     logger.info("")

@@ -1,5 +1,5 @@
 """
-ML Model Service for FairLens
+ML Model Service for BiasCheck
 Handles model training, prediction, and fairness evaluation
 """
 

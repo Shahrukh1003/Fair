@@ -1,5 +1,5 @@
 """
-Fairness Metrics Module for FairLens
+Fairness Metrics Module for BiasCheck
 
 Purpose: Compute Disparate Impact Ratio (DIR) and group approval gaps.
 
@@ -7,7 +7,7 @@ This module implements the EEOC 80% rule (also known as the four-fifths rule),
 which is a legal standard used to detect adverse impact in employment and lending.
 A DIR < 0.8 indicates potential discrimination against the protected group.
 
-How it fits: This is the METRIC step in the FairLens pipeline.
+How it fits: This is the METRIC step in the BiasCheck pipeline.
 Data → Metric → Detect → Alert → Log → Explain → Visualize
 """
 

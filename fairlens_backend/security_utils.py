@@ -1,5 +1,5 @@
 """
-Security Utilities Module for FairLens
+Security Utilities Module for BiasCheck
 
 Purpose: Anonymize data and encrypt/decrypt alert messages.
 
@@ -7,7 +7,7 @@ This module provides cryptographic functions for securing sensitive information:
 1. Fernet symmetric encryption for alert messages
 2. SHA256 hashing for pseudonymization of application IDs
 
-How it fits: This is the SECURITY layer across the FairLens pipeline.
+How it fits: This is the SECURITY layer across the BiasCheck pipeline.
 Data → Metric → Detect → Alert → [ENCRYPT] → Log → Explain → Visualize
 """
 

@@ -1,5 +1,5 @@
 """
-Model Registry for FairLens
+Model Registry for BiasCheck
 Manages model versioning, storage, and metadata tracking
 """
 

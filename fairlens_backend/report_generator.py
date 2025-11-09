@@ -1,5 +1,5 @@
 """
-Enterprise Report Generator for FairLens v3.0
+Enterprise Report Generator for BiasCheck v3.0
 Creates compliance-ready PDF and CSV reports
 """
 
@@ -110,7 +110,7 @@ class ReportGenerator:
         story = []
         
         # Title Page
-        story.append(Paragraph("FairLens Fairness Compliance Report", self.styles['CustomTitle']))
+        story.append(Paragraph("BiasCheck Fairness Compliance Report", self.styles['CustomTitle']))
         story.append(Spacer(1, 12))
         story.append(Paragraph(
             f"Generated: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}",
@@ -301,7 +301,7 @@ class ReportGenerator:
         with open(filepath, 'w', newline='') as csvfile:
             # Write metrics summary
             writer = csv.writer(csvfile)
-            writer.writerow(['FairLens Data Export'])
+            writer.writerow(['BiasCheck Data Export'])
             writer.writerow(['Generated:', datetime.now().isoformat()])
             writer.writerow([])
             

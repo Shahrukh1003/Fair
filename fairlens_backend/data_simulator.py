@@ -1,5 +1,5 @@
 """
-Data Simulator Module for FairLens
+Data Simulator Module for BiasCheck
 
 Purpose: Generate synthetic loan application records with controllable bias.
 
@@ -7,7 +7,7 @@ This module creates realistic loan application datasets where bias can be inject
 in a controlled manner by reducing approval rates for protected groups (e.g., females)
 relative to privileged groups (e.g., males).
 
-How it fits: This is the DATA step in the FairLens pipeline.
+How it fits: This is the DATA step in the BiasCheck pipeline.
 Data → Metric → Detect → Alert → Log → Explain → Visualize
 """
 

@@ -1,5 +1,5 @@
 """
-Enhanced Explainability Module for FairLens v3.0
+Enhanced Explainability Module for BiasCheck v3.0
 Advanced feature attribution and AI-assisted remediation suggestions
 """
 

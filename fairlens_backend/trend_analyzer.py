@@ -1,11 +1,11 @@
 """
-Trend Analyzer for FairLens Fairness Monitoring System
+Trend Analyzer for BiasCheck Fairness Monitoring System
 
 Purpose: Analyze temporal fairness trends and predict drift before it happens.
 This module implements predictive fairness monitoring by detecting gradual
 degradation in fairness metrics over time.
 
-How it fits: This is the PREDICTIVE layer in the FairLens pipeline.
+How it fits: This is the PREDICTIVE layer in the BiasCheck pipeline.
 Data → Metric → Detect → Alert → Log → DB → [Trend Analysis] → Pre-Alert
 """
 

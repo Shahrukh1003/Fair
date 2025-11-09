@@ -1,5 +1,5 @@
 """
-Compliance Logger Module for FairLens
+Compliance Logger Module for BiasCheck
 
 Purpose: Implement append-only, immutable JSONL audit log for regulatory compliance.
 
@@ -10,7 +10,7 @@ immutable audit trail for compliance reviews, regulatory audits, and forensic an
 Storage format: JSON Lines (JSONL) - one JSON object per line.
 This format enables streaming reads, efficient tail operations, and easy parsing.
 
-How it fits: This is the LOG step in the FairLens pipeline.
+How it fits: This is the LOG step in the BiasCheck pipeline.
 Data → Metric → Detect → Alert → Log → Explain → Visualize
 """
 

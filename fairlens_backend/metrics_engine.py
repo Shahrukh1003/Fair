@@ -1,5 +1,5 @@
 """
-Multi-Metric Fairness Engine for FairLens v3.0
+Multi-Metric Fairness Engine for BiasCheck v3.0
 Implements comprehensive fairness metrics beyond DIR
 """
 

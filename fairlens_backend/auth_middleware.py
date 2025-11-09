@@ -1,5 +1,5 @@
 """
-Authentication Middleware for FairLens
+Authentication Middleware for BiasCheck
 
 Purpose: Implement role-based access control (RBAC) for compliance endpoints.
 
@@ -7,7 +7,7 @@ This module provides simple token-based authentication to demonstrate
 how fairness monitoring systems should restrict access to sensitive
 compliance data based on user roles.
 
-How it fits: This is the SECURITY layer protecting the FairLens API.
+How it fits: This is the SECURITY layer protecting the BiasCheck API.
 User → [Auth Check] → API → Data → Metric → Alert → Log
 """
 

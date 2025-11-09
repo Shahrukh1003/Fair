@@ -1,5 +1,5 @@
 """
-FairLens Configuration Module
+BiasCheck Configuration Module
 Manages dual-mode operation (demo vs production) and system settings
 """
 

@@ -1,5 +1,5 @@
 """
-JWT Authentication Module for FairLens v3.0
+JWT Authentication Module for BiasCheck v3.0
 
 Provides secure JWT-based authentication with access and refresh tokens.
 Supports role-based access control (monitor, auditor, admin).

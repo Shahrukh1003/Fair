@@ -1,5 +1,5 @@
 """
-FairLens - Fairness Drift Alert System
+BiasCheck - Fairness Drift Alert System
 
 A lightweight, runnable Flask-based Fairness Drift Alert System that:
 1. Simulates loan decisions with controllable bias
@@ -13,4 +13,4 @@ Pipeline: Data → Metric → Detect → Alert → Log → Explain → Visualize
 """
 
 __version__ = "1.0.0"
-__author__ = "FairLens Team"
+__author__ = "BiasCheck Team"
