@@ -20,8 +20,9 @@ const getApiBaseUrl = () => {
   return 'http://localhost:8000/api';
 };
 
-export const TOKEN_KEY = 'fairlens_auth_token';
-export const ROLE_KEY = 'fairlens_user_role';
+export const TOKEN_KEY = 'fairlens_access_token';
+export const REFRESH_TOKEN_KEY = 'fairlens_refresh_token';
+export const USER_KEY = 'fairlens_user';
 
 export const authUtils = {
   getToken: (): string | null => {
@@ -37,23 +38,30 @@ export const authUtils = {
     }
   },
 
-  getRole: (): string | null => {
+  getUser: (): any | null => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem(ROLE_KEY);
+      const userStr = localStorage.getItem(USER_KEY);
+      if (!userStr) return null;
+      try {
+        return JSON.parse(userStr);
+      } catch {
+        return null;
+      }
     }
     return null;
   },
 
-  setRole: (role: string): void => {
+  setUser: (user: any): void => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(ROLE_KEY, role);
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
     }
   },
 
   clearAuth: (): void => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(ROLE_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
     }
   },
 
