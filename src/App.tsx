@@ -30,6 +30,10 @@ import { Login } from './components/Login';
 import { FairnessTrend } from './components/FairnessTrend';
 import { PreAlertPanel } from './components/PreAlertPanel';
 import { BlockchainAudit } from './components/BlockchainAudit';
+import { MultiMetricDashboard } from './components/MultiMetricDashboard';
+import { FeatureContributionPanel } from './components/FeatureContributionPanel';
+import { RemediationPanel } from './components/RemediationPanel';
+import { ComplianceReports } from './components/ComplianceReports';
 import { useMonitorMutation, useAuditHistory, useHealthCheck } from './hooks/useFairnessMonitor';
 import { authUtils } from './api/client';
 import type { FairnessCheckResponse } from './types/fairness';
@@ -329,7 +333,7 @@ function DashboardContent() {
                   textShadow: '0 0 30px rgba(255, 255, 255, 0.3)',
                 }}
               >
-                FairLens
+                FairLens v3.0
               </Typography>
               <Typography 
                 variant="caption" 
@@ -343,7 +347,7 @@ function DashboardContent() {
                   fontSize: '0.7rem',
                 }}
               >
-                AI Fairness Monitoring Platform
+                Predictive Fairness Governance Platform
               </Typography>
             </Box>
           </Box>
@@ -487,9 +491,9 @@ function DashboardContent() {
                   letterSpacing: '-0.01em',
                 }}
               >
-                This platform continuously monitors AI fairness in loan approval decisions using the <strong>EEOC 80% rule</strong>.
-                A <strong>DIR (Disparate Impact Ratio)</strong> below 0.8 indicates potential bias.
-                The system provides predictive alerts, tamper-proof audit trails, and actionable insights for compliance teams.
+                Production-grade AI fairness governance system monitoring real ML models with <strong>5 fairness metrics</strong> (DIR, SPD, EOD, AOD, Theil Index).
+                Features predictive drift monitoring, feature attribution analysis, AI-assisted remediation, and enterprise compliance reporting.
+                Built for regulated industries requiring comprehensive bias detection and audit trails.
               </Typography>
             </Box>
           </Box>
@@ -522,6 +526,16 @@ function DashboardContent() {
             animation: 'slideInRight 0.8s ease-out',
           }}>
             <Stack spacing={3}>
+              <MultiMetricDashboard nSamples={nSamples} driftLevel={driftLevel} autoRefresh={autoRefresh} />
+              
+              <FeatureContributionPanel nSamples={nSamples} driftLevel={driftLevel} autoRefresh={autoRefresh} />
+              
+              <RemediationPanel nSamples={nSamples} driftLevel={driftLevel} autoRefresh={autoRefresh} />
+              
+              {isAuditorOrAdmin && (
+                <ComplianceReports nSamples={nSamples} driftLevel={driftLevel} />
+              )}
+              
               <PreAlertPanel />
 
               {monitorMutation.isPending && (
@@ -549,17 +563,6 @@ function DashboardContent() {
                     <MetricsOverview scenario={lastResult.fair_scenario} isFair />
                   )}
                 </>
-              )}
-
-              {!lastResult && !monitorMutation.isPending && (
-                <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'grey.50' }}>
-                  <Typography variant="h6" color="text.secondary" gutterBottom>
-                    No fairness check has been run yet
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Use the controls on the left to configure and run your first fairness check
-                  </Typography>
-                </Paper>
               )}
             </Stack>
           </Box>
@@ -609,7 +612,7 @@ function DashboardContent() {
                   mb: 0.5,
                 }}
               >
-                FairLens v2.0.0
+                FairLens v3.0.0 - Production Grade
               </Typography>
               <Typography 
                 variant="caption" 
@@ -618,7 +621,7 @@ function DashboardContent() {
                   display: 'block',
                 }}
               >
-                Ensuring Fair Lending Practices Through AI Monitoring
+                Multi-Metric Fairness Governance | Real ML Models | Enterprise Compliance
               </Typography>
             </Box>
             <Box sx={{ textAlign: 'right' }}>
@@ -630,7 +633,7 @@ function DashboardContent() {
                   mb: 0.5,
                 }}
               >
-                EEOC 80% Rule Compliance | Predictive Monitoring Active
+                5 Fairness Metrics | Feature Attribution | AI Remediation | PDF/CSV Reports
               </Typography>
               <Typography 
                 variant="caption" 
