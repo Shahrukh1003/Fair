@@ -1,0 +1,42 @@
+{
+  "models": [
+    {
+      "model_id": "model_v1.0_20251109_045236",
+      "version": "v1.0",
+      "filepath": "fairlens_backend/models/loan_model_v1.0.pkl",
+      "registered_at": "2025-11-09T04:52:36.355244",
+      "description": "Default loan approval model (Logistic Regression)",
+      "tags": [
+        "default",
+        "production"
+      ],
+      "metadata": {
+        "model_version": "v1.0",
+        "training_date": "2025-11-09T04:52:36.344781",
+        "train_accuracy": 0.74875,
+        "test_accuracy": 0.746,
+        "precision": 0.7411764705882353,
+        "recall": 0.756,
+        "f1_score": 0.7485148514851485,
+        "n_samples_train": 4000,
+        "n_samples_test": 1000,
+        "feature_importance": {
+          "income": 4.991366022285398e-05,
+          "credit_score": 0.0024396702008484595,
+          "age": 0.08147857006510385,
+          "existing_debt": -8.132896825504707e-05,
+          "employment_length": 0.1837705606076522
+        }
+      },
+      "feature_names": [
+        "income",
+        "credit_score",
+        "age",
+        "existing_debt",
+        "employment_length"
+      ],
+      "status": "active"
+    }
+  ],
+  "active_model": "model_v1.0_20251109_045236"
+}
