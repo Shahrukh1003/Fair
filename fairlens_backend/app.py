@@ -289,7 +289,7 @@ def monitor_fairness():
 
 
 @app.route('/api/audit_history', methods=['GET'])
-@require_role('auditor')
+@require_jwt(['auditor', 'admin'])
 def audit_history():
     """
     Retrieve compliance audit log.
@@ -432,7 +432,7 @@ def predict_drift():
 
 
 @app.route('/api/verify_alert/<record_id>', methods=['GET'])
-@require_role('auditor')
+@require_jwt(['auditor', 'admin'])
 def verify_alert(record_id):
     """
     Verify integrity of a specific audit record.
@@ -1025,7 +1025,7 @@ def explainability():
 
 
 @app.route('/api/export_report', methods=['GET'])
-@require_role(['auditor', 'admin'])
+@require_jwt(['auditor', 'admin'])
 def export_report():
     """
     Generate and download comprehensive PDF compliance report
@@ -1087,7 +1087,7 @@ def export_report():
 
 
 @app.route('/api/export_csv', methods=['GET'])
-@require_role(['auditor', 'admin'])
+@require_jwt(['auditor', 'admin'])
 def export_csv():
     """
     Export fairness data to CSV format
