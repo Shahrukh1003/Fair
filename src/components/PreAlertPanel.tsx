@@ -27,7 +27,7 @@ export function PreAlertPanel() {
     );
   }
 
-  if (!preAlert || !driftPrediction) return null;
+  if (!preAlert || !driftPrediction || !driftPrediction.current_dir) return null;
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -119,7 +119,7 @@ export function PreAlertPanel() {
               Current DIR
             </Typography>
             <Typography variant="h6" fontWeight={700} color={driftPrediction.current_dir < 0.8 ? 'error.main' : 'text.primary'}>
-              {driftPrediction.current_dir.toFixed(3)}
+              {driftPrediction.current_dir?.toFixed(3) || 'N/A'}
             </Typography>
           </Box>
           <Box sx={{ flex: 1, minWidth: 120, p: 1.5, bgcolor: 'rgba(255, 255, 255, 0.7)', borderRadius: 2 }}>
@@ -127,7 +127,7 @@ export function PreAlertPanel() {
               Velocity
             </Typography>
             <Typography variant="h6" fontWeight={700} color={driftPrediction.is_accelerating ? 'error.main' : 'text.primary'}>
-              {driftPrediction.velocity > 0 ? '+' : ''}{driftPrediction.velocity.toFixed(3)}
+              {driftPrediction.velocity !== null && driftPrediction.velocity !== undefined ? (driftPrediction.velocity > 0 ? '+' : '') + driftPrediction.velocity.toFixed(3) : 'N/A'}
             </Typography>
           </Box>
           <Box sx={{ flex: 1, minWidth: 120, p: 1.5, bgcolor: 'rgba(255, 255, 255, 0.7)', borderRadius: 2 }}>
@@ -135,7 +135,7 @@ export function PreAlertPanel() {
               Confidence
             </Typography>
             <Typography variant="h6" fontWeight={700}>
-              {(driftPrediction.confidence * 100).toFixed(0)}%
+              {driftPrediction.confidence !== null && driftPrediction.confidence !== undefined ? (driftPrediction.confidence * 100).toFixed(0) + '%' : 'N/A'}
             </Typography>
           </Box>
         </Box>
