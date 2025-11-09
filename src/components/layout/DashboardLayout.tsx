@@ -410,7 +410,7 @@ export function DashboardLayout() {
       >
         <Box
           sx={{
-            display: { xs: 'none', md: 'flex' },
+            display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             px: 3,
