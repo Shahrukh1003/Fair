@@ -377,6 +377,7 @@ export function DashboardLayout() {
 
       <Drawer
         variant="permanent"
+        key={sidebarOpen ? 'open' : 'closed'}
         sx={{
           display: { xs: 'none', md: 'block' },
           '& .MuiDrawer-paper': {
