@@ -1,18 +1,22 @@
-import { Box, Grid, Paper, Typography, Card, CardContent, LinearProgress } from '@mui/material';
+import type { ReactNode } from 'react';
+import { Box, Grid, Paper, Typography, Card, CardContent, LinearProgress, Fade } from '@mui/material';
 import {
   TrendingUp,
   Warning,
   CheckCircle,
   Assessment,
+  Speed,
 } from '@mui/icons-material';
 import { useHealthCheck } from '../hooks/useFairnessMonitor';
 import { useFairnessTrend, useDriftPrediction } from '../hooks/useFairnessV3';
+import { SectionHeader } from '../components/SectionHeader';
+import { MetricCardSkeleton, ChartSkeleton } from '../components/LoadingSkeleton';
 
 interface MetricCardProps {
   title: string;
   value: string | number;
   subtitle?: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   trend?: 'up' | 'down' | 'neutral';
   color?: string;
 }
@@ -77,9 +81,11 @@ function MetricCard({ title, value, subtitle, icon, trend, color = '#6366f1' }: 
 }
 
 export function OverviewPage() {
-  const { data: health } = useHealthCheck();
-  const { data: trendData } = useFairnessTrend();
-  const { data: driftData } = useDriftPrediction();
+  const { data: health, isLoading: healthLoading } = useHealthCheck();
+  const { data: trendData, isLoading: trendLoading } = useFairnessTrend();
+  const { data: driftData, isLoading: driftLoading } = useDriftPrediction();
+
+  const isLoading = healthLoading || trendLoading || driftLoading;
 
   const complianceScore = trendData?.trend_data && trendData.trend_data.length > 0
     ? Math.round((trendData.trend_data.filter((d: any) => d.dir >= 0.8).length / trendData.trend_data.length) * 100)
@@ -87,69 +93,100 @@ export function OverviewPage() {
 
   return (
     <Box>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: 'primary.main' }}>
-          System Overview
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          Real-time monitoring of AI fairness across all deployed models
-        </Typography>
-      </Box>
+      <SectionHeader
+        title="System Overview"
+        subtitle="Real-time monitoring of AI fairness across all deployed models"
+        icon={<Speed sx={{ fontSize: 24, color: 'primary.main' }} />}
+      />
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} lg={3}>
-          <MetricCard
-            title="System Status"
-            value={health?.status === 'healthy' ? 'Online' : 'Offline'}
-            subtitle="All services operational"
-            icon={<CheckCircle sx={{ fontSize: 28, color: '#10b981' }} />}
-            color="#10b981"
-            trend="neutral"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
-          <MetricCard
-            title="Compliance Score"
-            value={`${complianceScore}%`}
-            subtitle="Based on fairness metrics"
-            icon={<Assessment sx={{ fontSize: 28, color: '#6366f1' }} />}
-            color="#6366f1"
-            trend={complianceScore >= 80 ? 'up' : 'down'}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
-          <MetricCard
-            title="Active Models"
-            value="1"
-            subtitle="Loan Approval Model v1.0"
-            icon={<TrendingUp sx={{ fontSize: 28, color: '#8b5cf6' }} />}
-            color="#8b5cf6"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
-          <MetricCard
-            title="Drift Status"
-            value={driftData?.alert ? 'Warning' : 'Normal'}
-            subtitle={driftData?.message || 'No drift detected'}
-            icon={<Warning sx={{ fontSize: 28, color: driftData?.alert ? '#f59e0b' : '#10b981' }} />}
-            color={driftData?.alert ? '#f59e0b' : '#10b981'}
-            trend={driftData?.alert ? 'down' : 'neutral'}
-          />
-        </Grid>
+      <Grid container spacing={3} sx={{ mb: 5 }}>
+        {isLoading ? (
+          <>
+            {[1, 2, 3, 4].map((i) => (
+              <Grid item xs={12} sm={6} lg={3} key={i}>
+                <MetricCardSkeleton />
+              </Grid>
+            ))}
+          </>
+        ) : (
+          <>
+            <Grid item xs={12} sm={6} lg={3}>
+              <Fade in timeout={300}>
+                <div>
+                  <MetricCard
+                    title="System Status"
+                    value={health?.status === 'healthy' ? 'Online' : 'Offline'}
+                    subtitle="All services operational"
+                    icon={<CheckCircle sx={{ fontSize: 28, color: '#10b981' }} />}
+                    color="#10b981"
+                    trend="neutral"
+                  />
+                </div>
+              </Fade>
+            </Grid>
+            <Grid item xs={12} sm={6} lg={3}>
+              <Fade in timeout={400}>
+                <div>
+                  <MetricCard
+                    title="Compliance Score"
+                    value={`${complianceScore}%`}
+                    subtitle="Based on fairness metrics"
+                    icon={<Assessment sx={{ fontSize: 28, color: '#6366f1' }} />}
+                    color="#6366f1"
+                    trend={complianceScore >= 80 ? 'up' : 'down'}
+                  />
+                </div>
+              </Fade>
+            </Grid>
+            <Grid item xs={12} sm={6} lg={3}>
+              <Fade in timeout={500}>
+                <div>
+                  <MetricCard
+                    title="Active Models"
+                    value="1"
+                    subtitle="Loan Approval Model v1.0"
+                    icon={<TrendingUp sx={{ fontSize: 28, color: '#8b5cf6' }} />}
+                    color="#8b5cf6"
+                  />
+                </div>
+              </Fade>
+            </Grid>
+            <Grid item xs={12} sm={6} lg={3}>
+              <Fade in timeout={600}>
+                <div>
+                  <MetricCard
+                    title="Drift Status"
+                    value={driftData?.alert ? 'Warning' : 'Normal'}
+                    subtitle={driftData?.message || 'No drift detected'}
+                    icon={<Warning sx={{ fontSize: 28, color: driftData?.alert ? '#f59e0b' : '#10b981' }} />}
+                    color={driftData?.alert ? '#f59e0b' : '#10b981'}
+                    trend={driftData?.alert ? 'down' : 'neutral'}
+                  />
+                </div>
+              </Fade>
+            </Grid>
+          </>
+        )}
       </Grid>
 
       <Grid container spacing={3}>
         <Grid item xs={12} lg={8}>
-          <Paper
-            sx={{
-              p: 3,
-              height: '100%',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
-              },
-            }}
-          >
+          {isLoading ? (
+            <ChartSkeleton height={300} />
+          ) : (
+            <Fade in timeout={700}>
+              <Paper
+                elevation={2}
+                sx={{
+                  p: 3,
+                  height: '100%',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&:hover': {
+                    boxShadow: 4,
+                    transform: 'translateY(-2px)',
+                  },
+                }}
+              >
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
               Compliance Status
             </Typography>
@@ -211,16 +248,22 @@ export function OverviewPage() {
         </Grid>
 
         <Grid item xs={12} lg={4}>
-          <Paper
-            sx={{
-              p: 3,
-              height: '100%',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
-              },
-            }}
-          >
+          {isLoading ? (
+            <ChartSkeleton height={300} />
+          ) : (
+            <Fade in timeout={800}>
+              <Paper
+                elevation={2}
+                sx={{
+                  p: 3,
+                  height: '100%',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&:hover': {
+                    boxShadow: 4,
+                    transform: 'translateY(-2px)',
+                  },
+                }}
+              >
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
               System Health
             </Typography>
@@ -263,7 +306,9 @@ export function OverviewPage() {
                 </Box>
               ))}
             </Box>
-          </Paper>
+              </Paper>
+            </Fade>
+          )}
         </Grid>
       </Grid>
     </Box>
