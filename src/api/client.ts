@@ -24,9 +24,9 @@ const getApiBaseUrl = () => {
   return 'http://localhost:8000/api';
 };
 
-export const TOKEN_KEY = 'fairlens_access_token';
-export const REFRESH_TOKEN_KEY = 'fairlens_refresh_token';
-export const USER_KEY = 'fairlens_user';
+export const TOKEN_KEY = 'biascheck_access_token';
+export const REFRESH_TOKEN_KEY = 'biascheck_refresh_token';
+export const USER_KEY = 'biascheck_user';
 
 export const authUtils = {
   getToken: (): string | null => {

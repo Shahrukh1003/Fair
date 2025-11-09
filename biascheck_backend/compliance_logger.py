@@ -53,7 +53,7 @@ def compute_record_hash(event_data: Dict) -> str:
 def log_event(
     event_type: str,
     details: Dict,
-    log_path: str = "fairlens_backend/compliance_audit_log.jsonl"
+    log_path: str = "biascheck_backend/compliance_audit_log.jsonl"
 ) -> str:
     """
     Append an event to the immutable compliance audit log.
@@ -90,7 +90,7 @@ def log_event(
         - drift_level: bias injection level
         - encrypted_alert: encrypted alert message token
     
-    log_path : str, default="fairlens_backend/compliance_audit_log.jsonl"
+    log_path : str, default="biascheck_backend/compliance_audit_log.jsonl"
         Path to the JSONL audit log file.
     
     Returns:
@@ -139,7 +139,7 @@ def log_event(
 
 
 def get_audit_history(
-    log_path: str = "fairlens_backend/compliance_audit_log.jsonl",
+    log_path: str = "biascheck_backend/compliance_audit_log.jsonl",
     last_n: int = 10
 ) -> List[Dict]:
     """
@@ -150,7 +150,7 @@ def get_audit_history(
     
     Parameters:
     -----------
-    log_path : str, default="fairlens_backend/compliance_audit_log.jsonl"
+    log_path : str, default="biascheck_backend/compliance_audit_log.jsonl"
         Path to the JSONL audit log file.
     
     last_n : int, default=10
@@ -225,7 +225,7 @@ def verify_record_integrity(record: Dict) -> bool:
 
 def get_record_by_hash(
     hash_value: str,
-    log_path: str = "fairlens_backend/compliance_audit_log.jsonl"
+    log_path: str = "biascheck_backend/compliance_audit_log.jsonl"
 ) -> Optional[Dict]:
     """
     Retrieve a specific record by its hash value.

@@ -6,7 +6,7 @@ packages = ["cargo", "freetype", "glibcLocales", "libiconv", "libxcrypt", "opens
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["sh", "-c", "FLASK_PORT=5000 python fairlens_backend/app.py"]
+run = ["sh", "-c", "FLASK_PORT=5000 python biascheck_backend/app.py"]
 build = ["npm", "run", "build"]
 
 [workflows]
@@ -30,7 +30,7 @@ outputType = "console"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "FLASK_PORT=8000 python fairlens_backend/app.py"
+args = "FLASK_PORT=8000 python biascheck_backend/app.py"
 waitForPort = 8000
 
 [[ports]]
@@ -44,10 +44,6 @@ externalPort = 3001
 [[ports]]
 localPort = 8000
 externalPort = 8000
-
-[[ports]]
-localPort = 41995
-externalPort = 3003
 
 [[ports]]
 localPort = 43407

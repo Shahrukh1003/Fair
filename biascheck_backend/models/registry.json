@@ -3,7 +3,7 @@
     {
       "model_id": "model_v1.0_20251109_045236",
       "version": "v1.0",
-      "filepath": "fairlens_backend/models/loan_model_v1.0.pkl",
+      "filepath": "biascheck_backend/models/loan_model_v1.0.pkl",
       "registered_at": "2025-11-09T04:52:36.355244",
       "description": "Default loan approval model (Logistic Regression)",
       "tags": [

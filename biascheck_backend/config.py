@@ -15,10 +15,10 @@ class Config:
     """BiasCheck Configuration"""
     
     # Operating mode
-    MODE = Mode(os.getenv("FAIRLENS_MODE", "demo"))
+    MODE = Mode(os.getenv("BIASCHECK_MODE", "demo"))
     
     # Model settings
-    MODEL_PATH = os.getenv("MODEL_PATH", "fairlens_backend/models")
+    MODEL_PATH = os.getenv("MODEL_PATH", "biascheck_backend/models")
     MODEL_VERSION = os.getenv("MODEL_VERSION", "v1.0")
     
     # Fairness thresholds
@@ -39,13 +39,13 @@ class Config:
     AUTO_RETRAIN_TRIGGER = os.getenv("AUTO_RETRAIN_TRIGGER", "true").lower() == "true"
     
     # Database
-    DATABASE_PATH = os.getenv("DATABASE_PATH", "fairlens_backend/fairness.db")
+    DATABASE_PATH = os.getenv("DATABASE_PATH", "biascheck_backend/biascheck.db")
     
     # Security
-    ENCRYPTION_KEY_PATH = os.getenv("ENCRYPTION_KEY_PATH", "fairlens_backend/fernet.key")
+    ENCRYPTION_KEY_PATH = os.getenv("ENCRYPTION_KEY_PATH", "biascheck_backend/fernet.key")
     
     # Reporting
-    REPORT_OUTPUT_PATH = os.getenv("REPORT_OUTPUT_PATH", "fairlens_backend/reports")
+    REPORT_OUTPUT_PATH = os.getenv("REPORT_OUTPUT_PATH", "biascheck_backend/reports")
     
     @classmethod
     def is_demo_mode(cls):

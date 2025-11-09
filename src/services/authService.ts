@@ -20,9 +20,9 @@ export interface User {
   role: 'admin' | 'auditor' | 'monitor';
 }
 
-const TOKEN_KEY = 'fairlens_access_token';
-const REFRESH_TOKEN_KEY = 'fairlens_refresh_token';
-const USER_KEY = 'fairlens_user';
+const TOKEN_KEY = 'biascheck_access_token';
+const REFRESH_TOKEN_KEY = 'biascheck_refresh_token';
+const USER_KEY = 'biascheck_user';
 
 class AuthService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {

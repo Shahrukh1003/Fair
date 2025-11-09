@@ -18,7 +18,7 @@ from typing import Optional, List
 import pandas as pd
 
 
-def init_key(key_path: str = "fairlens_backend/fernet.key") -> bytes:
+def init_key(key_path: str = "biascheck_backend/fernet.key") -> bytes:
     """
     Initialize or load Fernet encryption key.
     
@@ -32,7 +32,7 @@ def init_key(key_path: str = "fairlens_backend/fernet.key") -> bytes:
     
     Parameters:
     -----------
-    key_path : str, default="fairlens_backend/fernet.key"
+    key_path : str, default="biascheck_backend/fernet.key"
         File path where the encryption key is stored.
     
     Returns:
