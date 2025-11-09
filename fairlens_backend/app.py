@@ -681,7 +681,7 @@ def evaluate_model():
         probabilities = ml_model.predict_proba(X)
         
         all_metrics = metrics_engine.calculate_all_metrics(
-            y_true=protected_attr,
+            y_true=predictions,
             y_pred=predictions,
             protected_attribute=protected_attr
         )
@@ -715,16 +715,24 @@ def fairness_summary():
     All 5 fairness metrics with compliance assessment
     """
     try:
+        import pandas as pd
+        import numpy as np
+        from datetime import datetime
+        
         n_samples = int(request.args.get('n_samples', 1000))
         drift_level = float(request.args.get('drift_level', 0.5))
         
         data = generate_loan_data(n_samples, drift_level=drift_level, seed=42)
         
-        import numpy as np
+        y_true = data['approved'].astype(int).values
+        protected_attr = (data['gender'] == 'Female').astype(int).values
         
-        y_pred = data['approved'].values
-        y_true = data['gender'].values
-        protected_attr = data['gender'].values
+        if ml_model:
+            feature_cols = ['income', 'credit_score', 'age', 'existing_debt', 'employment_length']
+            X = data[feature_cols]
+            y_pred = ml_model.predict(X)
+        else:
+            y_pred = y_true
         
         all_metrics = metrics_engine.calculate_all_metrics(y_true, y_pred, protected_attr)
         
@@ -732,7 +740,7 @@ def fairness_summary():
             "n_samples": n_samples,
             "drift_level": drift_level,
             "metrics": all_metrics,
-            "timestamp": pd.Timestamp.now().isoformat()
+            "timestamp": datetime.now().isoformat()
         })
     
     except Exception as e:
@@ -755,23 +763,27 @@ def explainability():
     Feature contributions, bias explanation, and remediation suggestions
     """
     try:
-        n_samples = int(request.args.get('n_samples', 1000))
-        drift_level = float(request.args.get('drift_level', 0.5))
-        
         import pandas as pd
         import numpy as np
         
+        n_samples = int(request.args.get('n_samples', 1000))
+        drift_level = float(request.args.get('drift_level', 0.5))
+        
         data = generate_loan_data(n_samples, drift_level=drift_level, seed=42)
         
-        y_pred = data['approved'].values
-        protected_attr = data['gender'].values
+        y_pred = data['approved'].astype(int).values
+        protected_attr = (data['gender'] == 'Female').astype(int).values
+        
+        feature_cols = [col for col in data.columns if col not in ['approved', 'gender', 'application_id']]
+        available_features = [col for col in feature_cols if col in data.columns]
         
         feature_importance = {}
         if ml_model:
-            feature_importance = ml_model.get_feature_importance()
-        else:
-            feature_cols = ['income', 'credit_score', 'age', 'existing_debt', 'employment_length']
-            feature_importance = {f: 1.0/len(feature_cols) for f in feature_cols}
+            raw_importance = ml_model.get_feature_importance()
+            feature_importance = {k: v for k, v in raw_importance.items() if k in available_features}
+        
+        if not feature_importance:
+            feature_importance = {f: 1.0/len(available_features) for f in available_features}
         
         feature_data = data[list(feature_importance.keys())]
         
@@ -782,7 +794,7 @@ def explainability():
             feature_importance
         )
         
-        all_metrics = metrics_engine.calculate_all_metrics(protected_attr, y_pred, protected_attr)
+        all_metrics = metrics_engine.calculate_all_metrics(y_pred, y_pred, protected_attr)
         
         drift_analysis = drift_monitor.generate_drift_report('DIR')
         current_dir = drift_analysis.get('current_value', 0.8)
@@ -836,10 +848,10 @@ def export_report():
         import numpy as np
         
         data = generate_loan_data(1000, drift_level=0.5, seed=42)
-        y_pred = data['approved'].values
-        protected_attr = data['gender'].values
+        y_pred = data['approved'].astype(int).values
+        protected_attr = (data['gender'] == 'Female').astype(int).values
         
-        metrics_summary = metrics_engine.calculate_all_metrics(protected_attr, y_pred, protected_attr)
+        metrics_summary = metrics_engine.calculate_all_metrics(y_pred, y_pred, protected_attr)
         
         drift_analysis = drift_monitor.generate_drift_report('DIR')
         
@@ -898,10 +910,10 @@ def export_csv():
         import numpy as np
         
         data = generate_loan_data(1000, drift_level=0.5, seed=42)
-        y_pred = data['approved'].values
-        protected_attr = data['gender'].values
+        y_pred = data['approved'].astype(int).values
+        protected_attr = (data['gender'] == 'Female').astype(int).values
         
-        metrics_summary = metrics_engine.calculate_all_metrics(protected_attr, y_pred, protected_attr)
+        metrics_summary = metrics_engine.calculate_all_metrics(y_pred, y_pred, protected_attr)
         
         audit_history = get_audit_history(last_n=100)
         

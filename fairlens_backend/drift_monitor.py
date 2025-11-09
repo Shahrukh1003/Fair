@@ -44,8 +44,8 @@ class DriftMonitor:
             
             # Query recent trend data
             cursor.execute("""
-                SELECT timestamp, dir, created_at
-                FROM fairness_trend
+                SELECT timestamp, dir_value, created_at
+                FROM fairness_trends
                 ORDER BY created_at DESC
                 LIMIT ?
             """, (window_size,))

@@ -45,7 +45,11 @@ def generate_loan_data(n_samples: int, drift_level: float, seed: int = 42) -> pd
         DataFrame with columns:
         - application_id: unique integer identifier (1 to n_samples)
         - gender: 'Male' or 'Female'
+        - income: annual income between $20,000 and $150,000
         - credit_score: integer score between 500 and 800
+        - age: applicant age between 22 and 65
+        - existing_debt: current debt between $0 and $80,000
+        - employment_length: years at current job (0-20)
         - approved: boolean indicating if loan was approved
     
     Examples:
@@ -90,6 +94,37 @@ def generate_loan_data(n_samples: int, drift_level: float, seed: int = 42) -> pd
         800
     ).astype(int)
     
+    # Generate additional realistic features for ML model
+    # Income: correlated with credit score, range $20k-$150k
+    income_base = (credit_scores - 500) * 200 + 20000
+    income = np.clip(
+        income_base + np.random.normal(0, 10000, size=n_samples),
+        20000,
+        150000
+    ).astype(int)
+    
+    # Age: adults between 22-65
+    age = np.clip(
+        np.random.normal(38, 12, size=n_samples),
+        22,
+        65
+    ).astype(int)
+    
+    # Existing debt: inversely correlated with credit score, range $0-$80k
+    debt_base = (800 - credit_scores) * 150
+    existing_debt = np.clip(
+        debt_base + np.random.normal(0, 5000, size=n_samples),
+        0,
+        80000
+    ).astype(int)
+    
+    # Employment length: years at current job, 0-20 years
+    employment_length = np.clip(
+        np.random.exponential(5, size=n_samples),
+        0,
+        20
+    ).astype(int)
+    
     # Generate approval decisions based on group-specific rates
     # Generate all random numbers at once for consistency
     random_values = np.random.rand(n_samples)
@@ -101,11 +136,15 @@ def generate_loan_data(n_samples: int, drift_level: float, seed: int = 42) -> pd
             approved = random_values[i] < male_approval_rate
         approvals.append(approved)
     
-    # Construct DataFrame
+    # Construct DataFrame with all features
     df = pd.DataFrame({
         'application_id': application_ids,
         'gender': genders,
+        'income': income,
         'credit_score': credit_scores,
+        'age': age,
+        'existing_debt': existing_debt,
+        'employment_length': employment_length,
         'approved': approvals
     })
     

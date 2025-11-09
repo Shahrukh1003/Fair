@@ -90,11 +90,11 @@ class EnhancedExplainer:
             'top_contributors': [
                 {
                     'feature': f,
-                    'score': data['contribution_score'],
-                    'difference': data['mean_difference'],
-                    'importance': data['feature_importance']
+                    'score': feat_data['contribution_score'],
+                    'difference': feat_data['mean_difference'],
+                    'importance': feat_data['feature_importance']
                 }
-                for f, data in ranked_features[:3]
+                for f, feat_data in ranked_features[:5]
             ]
         }
     
@@ -118,7 +118,7 @@ class EnhancedExplainer:
             
             cursor.execute("""
                 SELECT timestamp, created_at
-                FROM fairness_trend
+                FROM fairness_trends
                 ORDER BY created_at DESC
                 LIMIT ?
             """, (window_size,))

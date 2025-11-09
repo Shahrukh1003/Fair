@@ -1,8 +1,10 @@
-# FairLens – Fairness Drift Alert System
+# FairLens v3.0 – Predictive Fairness Governance Platform
 
 ## Overview
 
-FairLens is a production-ready fairness monitoring system that detects bias in automated loan decisions using the EEOC 80% rule (Disparate Impact Ratio). The system generates synthetic loan application data with controllable bias levels, computes fairness metrics, triggers encrypted alerts when bias is detected, maintains an immutable compliance audit log, and provides statistical explanations for detected bias. The application features both a Flask REST API backend and a React + TypeScript frontend dashboard for real-time visualization and monitoring.
+FairLens v3.0 is a production-grade AI fairness governance system that monitors real ML models in deployment using comprehensive multi-metric auditing, predictive bias forecasting, and deep explainability. The system implements 5 industry-standard fairness metrics (DIR, SPD, EOD, AOD, Theil Index), provides AI-assisted remediation suggestions, generates enterprise PDF/CSV compliance reports, and features both a Flask REST API backend with real ML model integration and a React + TypeScript frontend dashboard for real-time visualization and monitoring.
+
+**v3.0 Upgrade**: Transformed from demo to production-grade system with real ML models, 5 fairness metrics, predictive drift monitoring with velocity/acceleration tracking, feature attribution analysis, and enterprise reporting capabilities.
 
 ## User Preferences
 
@@ -36,18 +38,28 @@ Preferred communication style: Simple, everyday language.
 
 **Language**: Python 3.11+
 
-**Module Structure**: The backend follows a pipeline architecture with six distinct stages:
-1. **Data Generation** (`data_simulator.py`) - Creates synthetic loan data with controllable bias
-2. **Metrics Calculation** (`fairness_metrics.py`) - Computes Disparate Impact Ratio using EEOC 80% rule
-3. **Alert Detection** - Triggers alerts when DIR < 0.8
-4. **Security** (`security_utils.py`) - Encrypts sensitive alert messages using Fernet symmetric encryption
-5. **Compliance Logging** (`compliance_logger.py`) - Maintains append-only JSONL audit trail
-6. **Explainability** (`explainability_module.py`) - Generates statistical analysis of bias causes
+**v3.0 Module Structure**: Production-grade architecture with 7 new modules:
 
-**API Endpoints**:
-- `/api/monitor_fairness` - Orchestrates the entire pipeline, generates data, computes metrics, triggers alerts
-- `/api/audit_history` - Retrieves compliance audit log entries
-- `/api/health` - Health check endpoint for monitoring backend availability
+1. **ML Model Service** (`model_service.py`) - Production Logistic Regression model with training pipeline (Accuracy: 0.746, F1: 0.749)
+2. **Model Registry** (`model_registry.py`) - Version management, save/load, active model tracking
+3. **Multi-Metric Engine** (`metrics_engine.py`) - 5 fairness metrics with extensible base class architecture
+4. **Advanced Drift Monitor** (`drift_monitor.py`) - Velocity, acceleration, confidence intervals, risk scoring
+5. **Enhanced Explainability** (`explainability_enhanced.py`) - Feature attribution, AI remediation suggestions, confidence weighting
+6. **Report Generator** (`report_generator.py`) - PDF compliance reports (ReportLab) and CSV export
+7. **Dual-Mode Config** (`config.py`) - Demo vs Production environment toggle
+
+**v3.0 API Endpoints**:
+- `/api/monitor_fairness` - Original fairness monitoring pipeline
+- `/api/evaluate_model` - **NEW** Real ML model predictions with fairness tracking
+- `/api/fairness_summary` - **NEW** All 5 metrics with compliance scoring
+- `/api/explainability` - **NEW** Feature contributions & AI remediation
+- `/api/export_report` - **NEW** PDF compliance report generation [auditor/admin]
+- `/api/export_csv` - **NEW** CSV data export [auditor/admin]
+- `/api/audit_history` - Compliance audit log retrieval
+- `/api/health` - Health check endpoint
+
+**Legacy Endpoints** (v2.0):
+- `/api/fairness_trend`, `/api/pre_alert`, `/api/predict_fairness_drift`, `/api/submit_predictions`, `/api/verify_alert`, `/api/login`, `/api/get_anchor`
 
 **Data Flow**: REST API → Data Simulator → Metrics Calculator → Alert Detector → Encryption → Compliance Logger → Explainability → JSON Response
 
