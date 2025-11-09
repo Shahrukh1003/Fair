@@ -1,0 +1,433 @@
+One-shot Replit Agent Prompt — Full production-grade backend for FairLens
+
+Build a production-grade backend for FairLens — Fairness Drift Alert System. Produce runnable code and tests. Work in the repo root. Use Python 3.11. Use Flask (or FastAPI if you prefer; here use Flask for compatibility). Use SQLite for demo but design for easy swap to Postgres. Use best-practice security and clear dev instructions. Implement the features exactly as described below.
+
+High-level goals (short)
+
+Real model integration: simple logistic regression model and model registry.
+
+Multi-metric fairness engine: DIR, SPD, EOD, AOD, Theil index.
+
+Temporal drift tracking with DB, rolling averages, and pre-alert.
+
+Predictive drift detection (moving average, velocity).
+
+RBAC auth with JWT tokens and refresh token flow.
+
+Stronger encryption for alerts using Fernet but with key management stubbed to env.
+
+Audit logs: JSONL + SQLite + SHA256 hash + optional blockchain anchor simulation.
+
+Role-based endpoints and audit verification.
+
+Webhooks / email placeholders for real notifications.
+
+CI test script and README + run instructions.
+
+Files to create or update (exact names)
+
+fairlens_backend/
+
+app.py
+
+config.py
+
+requirements.txt
+
+model_registry.py
+
+model_train.py
+
+data_simulator.py
+
+fairness_metrics.py
+
+trend_analyzer.py
+
+fairness_predictor.py
+
+security_utils.py
+
+auth.py
+
+compliance_logger.py
+
+blockchain_anchor.py
+
+webhooks.py
+
+tests/
+
+test_endpoints.sh
+
+test_unit.py
+
+migrations/ (placeholder)
+
+README.md
+
+Dependencies (requirements.txt)
+flask
+flask-cors
+pyjwt
+pandas
+numpy
+scikit-learn
+cryptography
+sqlalchemy
+alembic
+pytest
+requests
+python-dotenv
+gunicorn
+
+Important environment variables (.env)
+
+FLASK_ENV=production
+
+PORT=5050
+
+DATABASE_URL=sqlite:///fairlens.db
+
+JWT_SECRET=<random secret>
+
+JWT_ALGORITHM=HS256
+
+JWT_ACCESS_EXPIRE=900
+
+JWT_REFRESH_EXPIRE=2592000
+
+FERNET_KEY=<Fernet.generate_key()>
+
+ALERT_THRESHOLD=0.8
+
+WEBHOOK_URL= (optional)
+
+ADMIN_PASSWORD=change-me
+
+Explain [env]: env var = configuration stored outside code.
+
+config.py
+
+Read .env variables with python-dotenv.
+
+Provide constants like DB path, threshold, jwt settings.
+
+model_registry.py
+
+Provide functions:
+
+register_model(name, version, model_obj, metadata) store metadata in DB or JSON.
+
+load_model(name, version) returns model object.
+
+Keep models in models/ folder. For demo, save sklearn logistic regression.
+
+Explain [registry]: registry = system that tracks model versions.
+
+model_train.py
+
+Script to train a small logistic regression on simulated data.
+
+Save model artifact using joblib.
+
+Provide CLI: python model_train.py --samples 5000 to train and save models/loan_model_v1.pkl.
+
+data_simulator.py
+
+generate_loan_data(n, drift_level=0.0, seed=42) -> pd.DataFrame
+
+Columns: application_id, gender, credit_score, income, region, approved (bool)
+
+Use drift_level to decrease approval rate for unprivileged group (female) progressively.
+
+Use reproducible RNG.
+
+fairness_metrics.py
+
+Implement functions:
+
+calc_rates(df, protected='gender', outcome='approved', privileged='Male', unprivileged='Female')
+
+return approval rates
+
+disparate_impact_ratio(...) returns float
+
+statistical_parity_diff(...) (SPD) = P(y=1|unpriv)-P(y=1|priv)
+
+equal_opportunity_diff(...) (EOD) = TPR_unpriv - TPR_priv
+
+For TPR need true labels. For demo simulate true_labels == approved with noise.
+
+average_odds_diff(...) (AOD) = mean of FPR and TPR diffs
+
+theil_index(...) (inequality measure)
+
+compute_all_metrics(df, protected='gender') -> dict return all metrics and human message
+
+Add robust input validation. Convert numpy types to native types before returning.
+
+Explain [TPR]: true positive rate = among real positives, fraction predicted positive.
+
+trend_analyzer.py
+
+Use SQLAlchemy with SQLite for demo.
+
+Table fairness_checks:
+
+id, record_id, timestamp, model, dir, spd, eod, aod, theil, alert, drift_level, female_rate, male_rate, hash_value
+
+log_to_db(entry_dict) insert rows.
+
+get_recent(window=20) return last N rows ordered by timestamp.
+
+rolling_average(metric, window=10) returns average and velocity (delta between halves).
+
+pre_alert_check(metric='dir', threshold=0.8, window=10) implement moving avg check and velocity based pre-alert logic.
+
+Explain [velocity]: velocity = how fast metric changes over time.
+
+fairness_predictor.py
+
+Use bootstrapping to compute confidence intervals for a metric.
+
+predict_drift(recent_dirs) compute trend, slope and probability that next DIR < threshold using simple linear regression and bootstrap.
+
+Return predicted DIR, probability, and recommended action (none / warn / retrain).
+
+security_utils.py
+
+load_fernet() read FERNET_KEY from env and return Fernet object.
+
+encrypt_text(text) -> token
+
+decrypt_text(token) -> text
+
+anonymize_df(df, cols=['application_id']) hash ids with SHA256
+
+sign_record(record_json) return RSA signature stubbed (explain how to replace with real kms)
+
+Add clear docstring showing how to plug AWS KMS or Hashicorp Vault.
+
+Explain [Fernet]: symmetric encryption for small secrets.
+
+auth.py (JWT)
+
+Implement JWT access and refresh tokens.
+
+Endpoints:
+
+POST /api/login {username, password} -> returns access_token, refresh_token.
+
+POST /api/refresh {refresh_token} -> new access_token.
+
+Role system: monitor, auditor, admin
+
+Users store in simple sqlite table users with hashed password (bcrypt optional). For simplicity use PBKDF2 from hashlib.
+
+Decorator @require_role(role) to protect endpoints. Return 401/403 correct codes and JSON messages.
+
+Explain [JWT]: token that proves identity.
+
+compliance_logger.py
+
+log_event(entry) does:
+
+compute record_id (uuid), timestamp.
+
+compute SHA256 hash of canonical JSON.
+
+store JSONL line in compliance_audit_log.jsonl.
+
+insert same into DB table fairness_checks including hash_value.
+
+call blockchain_anchor.anchor_to_blockchain(hash) asynchronously placeholder.
+
+encrypt alert text and store encrypted_alert in DB if alert True.
+
+Provide verify_record(record_id) recompute hash and compare.
+
+Ensure JSON serializability.
+
+blockchain_anchor.py
+
+Simulated anchoring (no real network calls).
+
+anchor_to_blockchain(hash) append to blockchain_anchors.jsonl with tx_id = 0x + first 16 chars.
+
+get_anchor(hash) returns anchor json if present.
+
+webhooks.py
+
+send_webhook(url, payload) use requests.post with retries.
+
+Hook into monitor pipeline for external alert destinations (Slack, webhook).
+
+app.py endpoints (full spec)
+
+GET / -> brief API doc
+
+GET /api/health -> status
+
+POST /api/login -> returns JWT
+
+POST /api/refresh -> refresh token
+
+GET /api/models -> list registered models (monitor role)
+
+POST /api/models/register -> uploads model metadata (admin)
+
+POST /api/evaluate_model -> run model on simulator or uploaded model. Body: {model_name, version, n_samples, drift_level, mode: demo|prod}
+
+Returns predictions, metrics, record_id
+
+Persists record via compliance_logger and trend_analyzer
+
+If alert, send webhook and encrypt alert text
+
+POST /api/submit_predictions -> accepts predictions list from real model. Computes metrics and logs.
+
+GET /api/monitor_fairness?scenario=fair|drifted&n_samples=1000 demo endpoint for quick checks.
+
+GET /api/fairness_trend?window=10 -> returns recent DIRs, moving avg, velocity
+
+GET /api/pre_alert -> runs pre_alert_check
+
+GET /api/predict_fairness_drift -> runs prediction engine
+
+GET /api/audit_history?limit=20 -> require_role(auditor) -> returns latest logs
+
+GET /api/verify_alert/<record_id> -> require_role(auditor) -> verify_record
+
+POST /api/admin/reset_key -> require_role(admin) -> rotate encryption key stub
+
+GET /api/get_anchor/<hash> -> return anchor details
+
+Add proper error handlers and consistent JSON format:
+{status: "success"| "error", data: {...}, message: "..."}
+
+Security specifics (do not skip)
+
+Use JWT with exp claim. Access token short lived.
+
+Store JWT secret in env.
+
+Use HTTPS in production. Add comment to use TLS termination.
+
+Do not store raw PII. Use anonymize_df before any storage.
+
+Fernet key stored in env. For prod, mention KMS usage.
+
+Rate limit critical endpoints (note to add later).
+
+Audit who decrypted alerts: log user id and timestamp when decryption happens.
+
+Testing & CI
+
+tests/test_unit.py: unit tests for metrics functions.
+
+tests/test_endpoints.sh: curl flows:
+
+login as admin -> get token
+
+call /api/evaluate_model demo
+
+call /api/fairness_trend
+
+call /api/monitor_fairness drifted
+
+call /api/audit_history with auditor token
+
+Add Makefile or run.sh:
+
+pip install -r fairlens_backend/requirements.txt
+
+python fairlens_backend/model_train.py (train demo model)
+
+python fairlens_backend/app.py
+
+bash fairlens_backend/tests/test_endpoints.sh
+
+Logging and observability
+
+Use Python logging module set to INFO.
+
+Log every incoming request (method, path, user role).
+
+Store metrics in DB for queries.
+
+Suggest integration with Prometheus + Grafana for production.
+
+Deployment notes (short)
+
+Use Gunicorn + Uvicorn workers behind nginx for production.
+
+Use Postgres for DB in prod. Update DATABASE_URL env.
+
+Use Redis for caching and rate limiting.
+
+Use AWS KMS or Hashicorp Vault for key storage.
+
+Use CI pipeline to run tests and build Docker image.
+
+Provide Dockerfile and docker-compose.yml skeleton (optional).
+
+Deliverable requirements from agent
+
+Create all files above and commit them.
+
+Ensure python fairlens_backend/app.py runs and binds to $PORT env or default 5050.
+
+Ensure unit tests pass: pytest fairlens_backend/tests.
+
+Provide a README.md with:
+
+Quick start local
+
+How to set .env values
+
+How to run tests
+
+How to train demo model
+
+Explanation of each endpoint with example curl commands
+
+Provide Postman collection JSON (optional).
+
+Print a small startup summary on server start listing active modules and endpoints.
+
+Extra instructions for the agent
+
+When you finish, show exactly:
+
+Which files were created
+
+Output of pytest -q
+
+curl sample responses for /api/health and /api/monitor_fairness?scenario=drifted
+
+If any step fails due to package issues, fix automatically. If cannot, explain exactly how to fix and provide the precise shell commands.
+
+Keep secrets out of code. Use placeholders in files .env.example.
+
+Quick copy-ready example curl flows to include in README
+
+Login admin:
+
+curl -s -X POST http://127.0.0.1:5050/api/login -H "Content-Type: application/json" -d '{"username":"admin","password":"change-me"}' | jq
+
+
+Demo fairness run:
+
+curl -s "http://127.0.0.1:5050/api/monitor_fairness?scenario=drifted&n_samples=1000" | jq
+
+
+Protected audit access:
+
+curl -s -H "Authorization: Bearer <AUDITOR_TOKEN>" "http://127.0.0.1:5050/api/audit_history?limit=5" | jq
+
+Final note to the agent
+
+Build robust code with comments. Keep functions small. Return useful errors not stack traces. Make the system modular so features can be swapped for real enterprise components. When done, list what is demo-only and what is production-ready.
+
+Paste that exact prompt into Replit Agent. It must create the backend and tests in one run. If something cannot be implemented because of environment limits, report clear fix commands. Do not ask me to choose features. Implement everything above.
