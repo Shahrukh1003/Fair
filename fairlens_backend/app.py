@@ -13,7 +13,7 @@ Data → Metric → Detect → Alert → Log → Explain → Visualize
                         [THIS API]              Dashboard queries
 """
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory, send_file
 from flask_cors import CORS
 import logging
 import os
@@ -60,7 +60,7 @@ except ImportError:
     from auth import authenticate_user, refresh_access_token, revoke_refresh_token, require_jwt, get_current_user
     from webhook_utils import send_fairness_alert, test_webhook_configuration
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../dist', static_url_path='')
 CORS(app)
 
 logging.basicConfig(
@@ -1392,6 +1392,23 @@ def index():
             "live_monitoring": "POST /api/submit_predictions -d '{\"model\":\"loan_v1\",\"predictions\":[...]}'"
         }
     })
+
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_react(path):
+    """Serve React frontend or API routes"""
+    # API routes pass through
+    if path.startswith('api/'):
+        return jsonify({"error": "API route not found"}), 404
+    
+    # Serve static files from dist folder
+    dist_path = os.path.join(os.path.dirname(__file__), '..', 'dist')
+    if path != "" and os.path.exists(os.path.join(dist_path, path)):
+        return send_from_directory(dist_path, path)
+    
+    # For all other routes, serve index.html (React Router will handle routing)
+    return send_from_directory(dist_path, 'index.html')
 
 
 if __name__ == '__main__':

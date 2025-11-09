@@ -14,8 +14,12 @@ import type {
 
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
-    const { protocol, hostname } = window.location;
-    return `${protocol}//${hostname}:8000/api`;
+    const { protocol, hostname, port } = window.location;
+    // Development: Use port 8000, Production: Same origin
+    if (port && port !== '80' && port !== '443' && port !== '5000') {
+      return `${protocol}//${hostname}:8000/api`;
+    }
+    return `${protocol}//${hostname}/api`;
   }
   return 'http://localhost:8000/api';
 };
