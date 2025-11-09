@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   Box,
-  Grid,
   Typography,
   Paper,
   Stack,
@@ -39,8 +38,8 @@ export function CompliancePage() {
         </Typography>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} lg={8}>
+      <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', lg: 'row' } }}>
+        <Box sx={{ flex: { lg: '1 1 66%' } }}>
           <Stack spacing={3}>
             <Paper
               sx={{
@@ -90,12 +89,12 @@ export function CompliancePage() {
 
             <BlockchainAudit />
           </Stack>
-        </Grid>
+        </Box>
 
-        <Grid item xs={12} lg={4}>
+        <Box sx={{ flex: { lg: '1 1 33%' } }}>
           <ComplianceReports nSamples={1000} driftLevel={0.5} />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 }
