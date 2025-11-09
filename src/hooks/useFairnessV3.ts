@@ -173,3 +173,59 @@ export function useExportCSV() {
     },
   });
 }
+
+export interface FairnessTrendResponse {
+  current_metrics?: {
+    avg_dir?: number;
+    avg_spd?: number;
+    avg_eod?: number;
+    avg_aod?: number;
+    avg_theil?: number;
+  };
+  trend_data?: Array<{
+    timestamp: string;
+    dir: number;
+    alert: boolean;
+    model_name?: string;
+  }>;
+}
+
+export interface DriftPredictionResponse {
+  avg_dir: number;
+  moving_average: number;
+  velocity: number;
+  acceleration: number;
+  confidence_interval: {
+    lower: number;
+    upper: number;
+  };
+  alert: boolean;
+  message: string;
+  recommendation?: string;
+}
+
+export function useFairnessTrend() {
+  return useQuery({
+    queryKey: ['fairness-trend'],
+    queryFn: async () => {
+      const { data } = await axios.get<FairnessTrendResponse>(
+        `${API_BASE}/api/fairness_trend`
+      );
+      return data;
+    },
+    refetchInterval: 30000,
+  });
+}
+
+export function useDriftPrediction() {
+  return useQuery({
+    queryKey: ['drift-prediction'],
+    queryFn: async () => {
+      const { data } = await axios.get<DriftPredictionResponse>(
+        `${API_BASE}/api/predict_fairness_drift`
+      );
+      return data;
+    },
+    refetchInterval: 30000,
+  });
+}
