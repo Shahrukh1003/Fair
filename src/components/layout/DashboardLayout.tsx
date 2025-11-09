@@ -160,7 +160,7 @@ export function DashboardLayout() {
                   letterSpacing: '-0.02em',
                 }}
               >
-                FairLens
+                BiasCheck
               </Typography>
               <Typography
                 variant="caption"
@@ -367,7 +367,7 @@ export function DashboardLayout() {
             {mobileOpen ? <Close /> : <MenuIcon />}
           </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700 }}>
-            FairLens
+            BiasCheck
           </Typography>
           <IconButton onClick={handleMenuClick} sx={{ color: 'white' }}>
             <Avatar

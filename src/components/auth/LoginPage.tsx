@@ -126,7 +126,7 @@ export function LoginPage() {
                     letterSpacing: '-0.03em',
                   }}
                 >
-                  FairLens
+                  BiasCheck
                 </Typography>
               </Box>
               <Typography
