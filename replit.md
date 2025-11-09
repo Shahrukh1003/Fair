@@ -1,8 +1,8 @@
-# FairLens v3.0 Enterprise – AI Fairness Governance Platform
+# BiasCheck v3.0 Enterprise – AI Fairness Governance Platform
 
 ## Overview
 
-FairLens v3.0 Enterprise is a production-grade AI fairness governance system that monitors real ML models in deployment using comprehensive multi-metric auditing, predictive bias forecasting, and deep explainability. The system implements 5 industry-standard fairness metrics (DIR, SPD, EOD, AOD, Theil Index), provides AI-assisted remediation suggestions, generates enterprise PDF/CSV compliance reports, and features both a Flask REST API backend with real ML model integration and a React + TypeScript frontend dashboard for real-time visualization and monitoring.
+BiasCheck v3.0 Enterprise is a production-grade AI fairness governance system that monitors real ML models in deployment using comprehensive multi-metric auditing, predictive bias forecasting, and deep explainability. The system implements 5 industry-standard fairness metrics (DIR, SPD, EOD, AOD, Theil Index), provides AI-assisted remediation suggestions, generates enterprise PDF/CSV compliance reports, and features both a Flask REST API backend with real ML model integration and a React + TypeScript frontend dashboard for real-time visualization and monitoring.
 
 **v3.0 Upgrade**: Transformed from demo to production-grade system with real ML models, 5 fairness metrics, predictive drift monitoring with velocity/acceleration tracking, feature attribution analysis, and enterprise reporting capabilities.
 

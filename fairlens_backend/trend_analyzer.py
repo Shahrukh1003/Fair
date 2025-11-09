@@ -264,7 +264,7 @@ Traditional Approach:
 - React after bias happens
 - Damage already done (complaints, legal issues)
 
-FairLens Approach:
+BiasCheck Approach:
 - Detect declining trends early
 - Alert before threshold violation
 - Preventive action possible

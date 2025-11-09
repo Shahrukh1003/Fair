@@ -1,8 +1,8 @@
-# FairLens v2.0 - Upgrade Summary
+# BiasCheck v2.0 - Upgrade Summary
 
 ## 🎉 Congratulations! Your System Has Been Upgraded
 
-FairLens has evolved from a basic fairness monitoring tool to a **production-grade ethical AI platform** ready for enterprise deployment and hackathon presentation.
+BiasCheck has evolved from a basic fairness monitoring tool to a **production-grade ethical AI platform** ready for enterprise deployment and hackathon presentation.
 
 ---
 
@@ -114,10 +114,10 @@ FairLens has evolved from a basic fairness monitoring tool to a **production-gra
 "Banks use AI for loan decisions, but these models can become biased over time. Current tools only detect bias after customers are harmed. We need predictive monitoring."
 
 ### 2. Solution
-"FairLens v2.0 predicts fairness drift before it crosses legal thresholds, provides tamper-proof audit trails, and enables transparent compliance through blockchain anchoring."
+"BiasCheck v2.0 predicts fairness drift before it crosses legal thresholds, provides tamper-proof audit trails, and enables transparent compliance through blockchain anchoring."
 
 ### 3. Innovation
-"Unlike existing fairness tools that are reactive, FairLens is predictive. We detect declining trends and alert teams before bias affects customers."
+"Unlike existing fairness tools that are reactive, BiasCheck is predictive. We detect declining trends and alert teams before bias affects customers."
 
 ### 4. Technical Highlights
 - Temporal trend analysis with moving averages
@@ -127,7 +127,7 @@ FairLens has evolved from a basic fairness monitoring tool to a **production-gra
 - Role-based access control for compliance
 
 ### 5. Real-World Impact
-"A bank using FairLens can detect fairness degradation 2 weeks before threshold breach, retrain the model proactively, and prevent customer harm entirely."
+"A bank using BiasCheck can detect fairness degradation 2 weeks before threshold breach, retrain the model proactively, and prevent customer harm entirely."
 
 ---
 
@@ -259,13 +259,13 @@ FairLens has evolved from a basic fairness monitoring tool to a **production-gra
 ## 💡 Key Messages
 
 ### For Judges
-"FairLens v2.0 is the first fairness monitoring system that predicts bias before it happens, provides tamper-proof audit trails, and enables transparent compliance through blockchain anchoring."
+"BiasCheck v2.0 is the first fairness monitoring system that predicts bias before it happens, provides tamper-proof audit trails, and enables transparent compliance through blockchain anchoring."
 
 ### For Technical Audience
 "We built a production-grade platform with temporal trend analysis, predictive drift detection, SHA256 fingerprinting, and blockchain anchoring - all in a modular, scalable architecture."
 
 ### For Business Audience
-"FairLens prevents costly bias incidents by detecting fairness degradation weeks before it affects customers, saving millions in legal fees and reputation damage."
+"BiasCheck prevents costly bias incidents by detecting fairness degradation weeks before it affects customers, saving millions in legal fees and reputation damage."
 
 ---
 
@@ -293,7 +293,7 @@ FairLens has evolved from a basic fairness monitoring tool to a **production-gra
 
 ## 🚀 You're Ready!
 
-Your FairLens v2.0 system is now:
+Your BiasCheck v2.0 system is now:
 - ✅ Fully functional
 - ✅ Production-grade
 - ✅ Hackathon-ready
@@ -330,4 +330,4 @@ http://localhost:8000
 
 **Built with ❤️ for ethical AI and fair lending practices**
 
-*FairLens v2.0 - Predicting Fairness, Preventing Bias*
+*BiasCheck v2.0 - Predicting Fairness, Preventing Bias*

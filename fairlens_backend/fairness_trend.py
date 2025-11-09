@@ -263,7 +263,7 @@ Cost of Reactive Response:
 - Emergency fixes: $50K - $500K
 
 Cost of Proactive Monitoring:
-- FairLens system: $10K - $50K
+- BiasCheck system: $10K - $50K
 - Regular model reviews: $20K/year
 - Prevented incidents: Priceless
 

@@ -1307,7 +1307,7 @@ def get_registry_summary():
 def index():
     """Root endpoint with API documentation."""
     return jsonify({
-        "service": "FairLens Fairness Drift Alert System",
+        "service": "BiasCheck Fairness Drift Alert System",
         "version": "3.0.0",
         "description": "Production-grade fairness monitoring with predictive analytics",
         "endpoints": {

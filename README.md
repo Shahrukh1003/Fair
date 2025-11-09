@@ -1,4 +1,4 @@
-# FairLens – Fairness Drift Alert System
+# BiasCheck – Fairness Drift Alert System
 
 A production-ready fairness monitoring system that detects bias in automated loan decisions using the EEOC 80% rule (Disparate Impact Ratio). The system provides real-time monitoring, encrypted alerts, immutable compliance logging, and statistical explanations for detected bias.
 

@@ -7,12 +7,12 @@ import os
 from enum import Enum
 
 class Mode(Enum):
-    """Operating modes for FairLens"""
+    """Operating modes for BiasCheck"""
     DEMO = "demo"
     PRODUCTION = "production"
 
 class Config:
-    """FairLens Configuration"""
+    """BiasCheck Configuration"""
     
     # Operating mode
     MODE = Mode(os.getenv("FAIRLENS_MODE", "demo"))
