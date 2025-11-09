@@ -183,6 +183,7 @@ export function DashboardLayout() {
             border: '1px solid rgba(255, 255, 255, 0.2)',
             width: 32,
             height: 32,
+            display: { xs: 'none', md: 'flex' },
             '&:hover': {
               bgcolor: 'rgba(255, 255, 255, 0.1)',
               color: 'white',
@@ -401,7 +402,6 @@ export function DashboardLayout() {
 
       <Drawer
         variant="permanent"
-        key={sidebarOpen ? 'open' : 'closed'}
         sx={{
           display: { xs: 'none', md: 'block' },
           '& .MuiDrawer-paper': {
@@ -423,11 +423,11 @@ export function DashboardLayout() {
         component="main"
         sx={{
           flexGrow: 1,
-          width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
+          ml: { xs: 0, md: `${drawerWidth}px` },
           minHeight: '100vh',
           bgcolor: '#f8fafc',
           pt: { xs: 8, md: 0 },
-          transition: theme.transitions.create(['width', 'margin'], {
+          transition: theme.transitions.create(['margin-left'], {
             duration: theme.transitions.duration.standard,
             easing: theme.transitions.easing.easeInOut,
           }),
@@ -446,23 +446,34 @@ export function DashboardLayout() {
             boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
           }}
         >
-          <IconButton
-            onClick={toggleSidebar}
-            sx={{
-              color: 'text.secondary',
-              '&:hover': {
-                bgcolor: 'action.hover',
-                transform: 'scale(1.05)',
-              },
-              transition: theme.transitions.create(['transform', 'background-color'], {
-                duration: theme.transitions.duration.shorter,
-              }),
-            }}
-            aria-label={sidebarOpen ? 'collapse sidebar' : 'expand sidebar'}
-            aria-expanded={sidebarOpen}
-          >
-            {sidebarOpen ? <ChevronLeft /> : <ChevronRight />}
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <IconButton
+              onClick={toggleSidebar}
+              sx={{
+                color: 'text.secondary',
+                border: '1px solid',
+                borderColor: 'divider',
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                  transform: 'scale(1.05)',
+                  borderColor: 'primary.main',
+                },
+                transition: theme.transitions.create(['transform', 'background-color', 'border-color'], {
+                  duration: theme.transitions.duration.shorter,
+                }),
+              }}
+              aria-label={sidebarOpen ? 'collapse sidebar' : 'expand sidebar'}
+              aria-expanded={sidebarOpen}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" fontWeight={700} color="text.primary">
+              {location.pathname.includes('monitoring') && 'Monitoring'}
+              {location.pathname.includes('compliance') && 'Compliance'}
+              {location.pathname.includes('admin') && 'Administration'}
+              {location.pathname === '/dashboard' && 'System Overview'}
+            </Typography>
+          </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
