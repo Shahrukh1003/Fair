@@ -121,57 +121,81 @@ export function DashboardLayout() {
           p: sidebarOpen ? 3 : 2,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: sidebarOpen ? 'flex-start' : 'center',
+          justifyContent: 'space-between',
           gap: 2,
           borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-          transition: theme.transitions.create(['padding', 'justify-content'], {
+          transition: theme.transitions.create(['padding'], {
             duration: theme.transitions.duration.standard,
             easing: theme.transitions.easing.easeInOut,
           }),
         }}
       >
-        <Box
-          sx={{
-            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-            p: 1.5,
-            borderRadius: 2,
-            display: 'flex',
-            boxShadow: '0 4px 20px rgba(99, 102, 241, 0.4)',
-          }}
-        >
-          <Assessment sx={{ fontSize: 28, color: 'white' }} />
-        </Box>
-        {sidebarOpen && (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Box
             sx={{
-              opacity: sidebarOpen ? 1 : 0,
-              transition: theme.transitions.create('opacity', {
-                duration: theme.transitions.duration.short,
-                easing: theme.transitions.easing.easeInOut,
-              }),
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+              p: 1.5,
+              borderRadius: 2,
+              display: 'flex',
+              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.4)',
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 900,
-                color: 'white',
-                letterSpacing: '-0.02em',
-              }}
-            >
-              FairLens
-            </Typography>
-            <Typography
-              variant="caption"
-              sx={{
-                color: 'rgba(255, 255, 255, 0.6)',
-                fontSize: '0.7rem',
-              }}
-            >
-              Enterprise v3.0
-            </Typography>
+            <Assessment sx={{ fontSize: 28, color: 'white' }} />
           </Box>
-        )}
+          {sidebarOpen && (
+            <Box
+              sx={{
+                opacity: sidebarOpen ? 1 : 0,
+                transition: theme.transitions.create('opacity', {
+                  duration: theme.transitions.duration.short,
+                  easing: theme.transitions.easing.easeInOut,
+                }),
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 900,
+                  color: 'white',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                FairLens
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  fontSize: '0.7rem',
+                }}
+              >
+                Enterprise v3.0
+              </Typography>
+            </Box>
+          )}
+        </Box>
+        
+        <IconButton
+          onClick={toggleSidebar}
+          size="small"
+          sx={{
+            color: 'rgba(255, 255, 255, 0.7)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            width: 32,
+            height: 32,
+            '&:hover': {
+              bgcolor: 'rgba(255, 255, 255, 0.1)',
+              color: 'white',
+              transform: 'scale(1.1)',
+            },
+            transition: theme.transitions.create(['transform', 'background-color', 'color'], {
+              duration: theme.transitions.duration.shorter,
+            }),
+          }}
+          aria-label={sidebarOpen ? 'collapse sidebar' : 'expand sidebar'}
+        >
+          {sidebarOpen ? <ChevronLeft fontSize="small" /> : <ChevronRight fontSize="small" />}
+        </IconButton>
       </Box>
 
       <List sx={{ flexGrow: 1, p: 2 }}>
