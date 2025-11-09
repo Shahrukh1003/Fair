@@ -1303,9 +1303,9 @@ def get_registry_summary():
         }), 500
 
 
-@app.route('/', methods=['GET'])
-def index():
-    """Root endpoint with API documentation."""
+@app.route('/api/docs', methods=['GET'])
+def api_documentation():
+    """API documentation endpoint."""
     return jsonify({
         "service": "BiasCheck Fairness Drift Alert System",
         "version": "3.0.0",
