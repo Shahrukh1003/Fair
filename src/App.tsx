@@ -3,6 +3,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
+import { LayoutProvider } from './contexts/LayoutContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './components/auth/LoginPage';
 import { DashboardLayout } from './components/layout/DashboardLayout';
@@ -52,27 +53,56 @@ const theme = createTheme({
       primary: '#0f172a',
       secondary: '#64748b',
     },
+    divider: 'rgba(226, 232, 240, 0.8)',
   },
+  spacing: 8,
   typography: {
     fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif',
+    h3: {
+      fontWeight: 700,
+      fontSize: '1.875rem',
+      letterSpacing: '-0.02em',
+      lineHeight: 1.2,
+    },
     h4: {
       fontWeight: 700,
+      fontSize: '1.5rem',
       letterSpacing: '-0.02em',
+      lineHeight: 1.3,
     },
     h5: {
       fontWeight: 700,
+      fontSize: '1.25rem',
       letterSpacing: '-0.01em',
+      lineHeight: 1.4,
     },
     h6: {
       fontWeight: 600,
+      fontSize: '1.125rem',
       letterSpacing: '-0.01em',
+      lineHeight: 1.5,
     },
     subtitle1: {
       fontWeight: 500,
+      fontSize: '1rem',
       letterSpacing: '-0.01em',
+      lineHeight: 1.5,
+    },
+    subtitle2: {
+      fontWeight: 500,
+      fontSize: '0.875rem',
+      letterSpacing: '-0.01em',
+      lineHeight: 1.43,
     },
     body1: {
+      fontSize: '1rem',
       letterSpacing: '-0.01em',
+      lineHeight: 1.5,
+    },
+    body2: {
+      fontSize: '0.875rem',
+      letterSpacing: '-0.01em',
+      lineHeight: 1.43,
     },
     button: {
       fontWeight: 600,
@@ -82,6 +112,23 @@ const theme = createTheme({
   },
   shape: {
     borderRadius: 12,
+  },
+  transitions: {
+    easing: {
+      easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      easeOut: 'cubic-bezier(0.0, 0, 0.2, 1)',
+      easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
+      sharp: 'cubic-bezier(0.4, 0, 0.6, 1)',
+    },
+    duration: {
+      shortest: 150,
+      shorter: 200,
+      short: 250,
+      standard: 300,
+      complex: 375,
+      enteringScreen: 225,
+      leavingScreen: 195,
+    },
   },
   shadows: [
     'none',
@@ -171,40 +218,42 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AuthProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<OverviewPage />} />
-                <Route path="monitoring" element={<MonitoringPage />} />
+          <LayoutProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/login" element={<LoginPage />} />
                 <Route
-                  path="compliance"
+                  path="/dashboard"
                   element={
-                    <ProtectedRoute requiredRoles={['admin', 'auditor']}>
-                      <CompliancePage />
+                    <ProtectedRoute>
+                      <DashboardLayout />
                     </ProtectedRoute>
                   }
-                />
-                <Route
-                  path="admin"
-                  element={
-                    <ProtectedRoute requiredRoles={['admin']}>
-                      <AdminPage />
-                    </ProtectedRoute>
-                  }
-                />
-              </Route>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-          </BrowserRouter>
+                >
+                  <Route index element={<OverviewPage />} />
+                  <Route path="monitoring" element={<MonitoringPage />} />
+                  <Route
+                    path="compliance"
+                    element={
+                      <ProtectedRoute requiredRoles={['admin', 'auditor']}>
+                        <CompliancePage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="admin"
+                    element={
+                      <ProtectedRoute requiredRoles={['admin']}>
+                        <AdminPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Route>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Routes>
+            </BrowserRouter>
+          </LayoutProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
