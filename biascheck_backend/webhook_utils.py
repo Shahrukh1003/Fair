@@ -181,7 +181,7 @@ def send_custom_webhook(
         'event_type': event_type,
         'severity': severity,
         'timestamp': datetime.now().isoformat(),
-        'source': 'fairlens_v3.0',
+        'source': 'biascheck_v3.0',
         'data': data
     }
     

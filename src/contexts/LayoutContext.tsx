@@ -11,12 +11,12 @@ const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 
 export function LayoutProvider({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(() => {
-    const stored = localStorage.getItem('fairlens-sidebar-open');
+    const stored = localStorage.getItem('biascheck-sidebar-open');
     return stored !== null ? stored === 'true' : true;
   });
 
   useEffect(() => {
-    localStorage.setItem('fairlens-sidebar-open', String(sidebarOpen));
+    localStorage.setItem('biascheck-sidebar-open', String(sidebarOpen));
   }, [sidebarOpen]);
 
   const toggleSidebar = () => {

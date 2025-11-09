@@ -15,7 +15,7 @@ A production-ready fairness monitoring system that detects bias in automated loa
 ## 📁 Project Structure
 
 ```
-fairlens_backend/
+biascheck_backend/
 ├── __init__.py                    # Package initialization
 ├── data_simulator.py             # Synthetic loan data generator
 ├── fairness_metrics.py           # DIR calculation (EEOC 80% rule)
@@ -68,7 +68,7 @@ Both workflows are configured and running automatically. Access the dashboard th
 
 ```bash
 # Start Flask API on port 8000
-FLASK_PORT=8000 python fairlens_backend/app.py
+FLASK_PORT=8000 python biascheck_backend/app.py
 
 # Start React Dashboard on port 5000 (in another terminal)
 npx vite --port 5000 --host 0.0.0.0
@@ -107,7 +107,7 @@ npx vite --port 5000 --host 0.0.0.0
 - Append-only JSONL format
 - Thread-safe for concurrent access
 - Contains: timestamp, event type, DIR value, encrypted alert, drift level
-- Stored in `fairlens_backend/compliance_audit_log.jsonl`
+- Stored in `biascheck_backend/compliance_audit_log.jsonl`
 
 ## 📊 API Endpoints
 
@@ -262,7 +262,7 @@ Expected: `"dir_alert": true`, DIR < 0.8, encrypted alert generated
 
 ### View Compliance Log
 ```bash
-cat fairlens_backend/compliance_audit_log.jsonl | tail -5 | jq .
+cat biascheck_backend/compliance_audit_log.jsonl | tail -5 | jq .
 ```
 
 ### Verify Encryption
@@ -272,7 +272,7 @@ curl -s "http://127.0.0.1:8000/api/monitor_fairness?drift_level=0.6" | jq -r '.d
 
 ## 📦 Dependencies
 
-All dependencies are listed in `fairlens_backend/requirements.txt`:
+All dependencies are listed in `biascheck_backend/requirements.txt`:
 
 - `flask` - REST API framework
 - `flask-cors` - Cross-origin resource sharing

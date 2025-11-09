@@ -124,22 +124,22 @@ Preferred communication style: Simple, everyday language.
 
 **PostgreSQL Database (ENTERPRISE)**:
 - **Production**: PostgreSQL via DATABASE_URL environment variable
-- **Development**: SQLite fallback at `fairlens_backend/fairness.db`
+- **Development**: SQLite fallback at `biascheck_backend/fairness.db`
 - **ORM**: SQLAlchemy with connection pooling (5-10 connections)
 - **Tables**: `fairness_trends` (model_name, DIR values, timestamps, alerts, explanations)
 - **Indexes**: Optimized for time-series queries (model_name + timestamp composite index)
 - **Features**: Transaction management, automatic rollback, session handling
 
-**Audit Logging**: JSON Lines (JSONL) format in `fairlens_backend/compliance_audit_log.jsonl`
+**Audit Logging**: JSON Lines (JSONL) format in `biascheck_backend/compliance_audit_log.jsonl`
 - One JSON object per line for streaming reads and efficient parsing
 - Thread-safe writes using threading locks
 - Append-only for immutability guarantees
 
-**Model Registry Storage**: JSON metadata in `fairlens_backend/models/registry.json`
+**Model Registry Storage**: JSON metadata in `biascheck_backend/models/registry.json`
 - Model versioning, activation tracking, performance metrics
-- Binary artifacts stored in `fairlens_backend/models/` (joblib pickles)
+- Binary artifacts stored in `biascheck_backend/models/` (joblib pickles)
 
-**Encryption Keys**: Local file storage in `fairlens_backend/fernet.key`
+**Encryption Keys**: Local file storage in `biascheck_backend/fernet.key`
 - Auto-generated on initialization if not present
 - Note: Production systems should use proper secrets management (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault)
 
@@ -205,7 +205,7 @@ Preferred communication style: Simple, everyday language.
 
 **Production Deployment** (Replit Autoscale):
 1. Build step: `npm run build` - Compiles React app to `dist/` folder
-2. Run command: `FLASK_PORT=5000 python fairlens_backend/app.py`
+2. Run command: `FLASK_PORT=5000 python biascheck_backend/app.py`
 3. Flask serves:
    - Static React frontend from `/dist` folder (all routes)
    - REST API endpoints from `/api/*` paths

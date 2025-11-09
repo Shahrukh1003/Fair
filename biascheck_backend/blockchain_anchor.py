@@ -39,7 +39,7 @@ def generate_mock_tx_id(record_hash: str) -> str:
     str : Mock transaction ID in blockchain format (0x...)
     """
     # Create a deterministic but unique-looking transaction ID
-    combined = f"fairlens_anchor_{record_hash}_{datetime.utcnow().isoformat()}"
+    combined = f"biascheck_anchor_{record_hash}_{datetime.utcnow().isoformat()}"
     tx_hash = hashlib.sha256(combined.encode()).hexdigest()
     return f"0x{tx_hash[:64]}"
 
