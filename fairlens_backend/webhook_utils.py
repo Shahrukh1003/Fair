@@ -47,25 +47,26 @@ def send_slack_alert(message: str, metrics: Dict[str, Any], severity: str = 'war
     
     color = color_map.get(severity, '#ff9900')
     
-    # Build Slack message
+    # Build Slack message fields
+    fields = []
+    for name, value in metrics.items():
+        fields.append({
+            'title': 'Metric',
+            'value': name,
+            'short': True
+        })
+        fields.append({
+            'title': 'Value',
+            'value': f"{value:.3f}" if isinstance(value, float) else str(value),
+            'short': True
+        })
+    
     payload = {
         'attachments': [{
             'color': color,
             'title': '⚠️ FairLens Fairness Alert',
             'text': message,
-            'fields': [
-                {
-                    'title': 'Metric',
-                    'value': name,
-                    'short': True
-                },
-                {
-                    'title': 'Value',
-                    'value': f"{value:.3f}" if isinstance(value, float) else str(value),
-                    'short': True
-                }
-                for name, value in metrics.items()
-            ],
+            'fields': fields,
             'footer': 'FairLens v3.0 - Predictive Fairness Governance',
             'ts': int(datetime.now().timestamp())
         }]
@@ -108,13 +109,21 @@ def send_email_alert(
         logger.debug("Email webhook not configured or disabled")
         return False
     
+    # Build metrics table rows
+    metrics_rows = []
+    for k, v in metrics.items():
+        value_str = f"{v:.3f}" if isinstance(v, float) else str(v)
+        metrics_rows.append(f'<tr><td>{k}</td><td>{value_str}</td></tr>')
+    metrics_table = ''.join(metrics_rows)
+    
     # Build email payload (format depends on your email service)
+    color = '#ff0000' if severity == 'critical' else '#ff9900'
     payload = {
         'subject': subject,
         'html': f"""
         <html>
         <body>
-            <h2 style="color: {'#ff0000' if severity == 'critical' else '#ff9900'};">
+            <h2 style="color: {color};">
                 ⚠️ FairLens Fairness Alert
             </h2>
             <p><strong>Severity:</strong> {severity.upper()}</p>
@@ -122,7 +131,7 @@ def send_email_alert(
             <h3>Metrics Snapshot:</h3>
             <table border="1" cellpadding="8" style="border-collapse: collapse;">
                 <tr><th>Metric</th><th>Value</th></tr>
-                {''.join(f'<tr><td>{k}</td><td>{v:.3f if isinstance(v, float) else v}</td></tr>' for k, v in metrics.items())}
+                {metrics_table}
             </table>
             <hr>
             <p><em>FairLens v3.0 - Predictive Fairness Governance</em></p>

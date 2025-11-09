@@ -1,16 +1,24 @@
-# FairLens v3.0 – Predictive Fairness Governance Platform
+# FairLens v3.0 Enterprise – AI Fairness Governance Platform
 
 ## Overview
 
-FairLens v3.0 is a production-grade AI fairness governance system that monitors real ML models in deployment using comprehensive multi-metric auditing, predictive bias forecasting, and deep explainability. The system implements 5 industry-standard fairness metrics (DIR, SPD, EOD, AOD, Theil Index), provides AI-assisted remediation suggestions, generates enterprise PDF/CSV compliance reports, and features both a Flask REST API backend with real ML model integration and a React + TypeScript frontend dashboard for real-time visualization and monitoring.
+FairLens v3.0 Enterprise is a production-grade AI fairness governance system that monitors real ML models in deployment using comprehensive multi-metric auditing, predictive bias forecasting, and deep explainability. The system implements 5 industry-standard fairness metrics (DIR, SPD, EOD, AOD, Theil Index), provides AI-assisted remediation suggestions, generates enterprise PDF/CSV compliance reports, and features both a Flask REST API backend with real ML model integration and a React + TypeScript frontend dashboard for real-time visualization and monitoring.
 
 **v3.0 Upgrade**: Transformed from demo to production-grade system with real ML models, 5 fairness metrics, predictive drift monitoring with velocity/acceleration tracking, feature attribution analysis, and enterprise reporting capabilities.
 
-**✅ PROJECT STATUS**: ALL 6 TRANSFORMATION PHASES 100% COMPLETE (November 9, 2025)
+**✅ ENTERPRISE UPGRADE COMPLETE** (November 9, 2025):
+- **JWT Authentication**: Secure access/refresh token system with role-based access control (admin, auditor, monitor)
+- **Webhook Alerts**: Real-time Slack/email notifications when fairness violations detected
+- **PostgreSQL Database**: Scalable persistence with SQLAlchemy ORM, connection pooling, and SQLite fallback
+- **Model Registry**: ML model versioning, activation, and metadata management APIs
+- **Production-Ready**: All v3.0 features + enterprise security, scalability, and monitoring
+
+**✅ PROJECT STATUS**: ALL 6 TRANSFORMATION PHASES + ENTERPRISE FEATURES 100% COMPLETE
 - Phases 1-5 (Backend): Production ML models, 5 metrics engine, drift monitoring, explainability, enterprise reporting ✅
 - Phase 6 (Frontend): React v3.0 components, multi-metric dashboard, feature attribution panels, remediation UI, compliance reports ✅
-- Quality Assurance: Architect-reviewed, TypeScript compiles clean, all v3.0 endpoints operational (200 OK responses confirmed) ✅
-- Ready for demonstration, sale, and deployment to production environments ✅
+- **ENTERPRISE**: JWT auth, webhooks, PostgreSQL, model versioning ✅
+- Quality Assurance: Architect-reviewed, TypeScript compiles clean, all endpoints operational (200 OK responses confirmed) ✅
+- Ready for enterprise sale and deployment to production environments ✅
 
 ## User Preferences
 
@@ -50,36 +58,61 @@ Preferred communication style: Simple, everyday language.
 
 **Language**: Python 3.11+
 
-**v3.0 Module Structure**: Production-grade architecture with 7 new modules:
+**v3.0 Module Structure**: Production-grade architecture with 7 core modules + 3 enterprise modules:
 
+**Core Modules:**
 1. **ML Model Service** (`model_service.py`) - Production Logistic Regression model with training pipeline (Accuracy: 0.746, F1: 0.749)
-2. **Model Registry** (`model_registry.py`) - Version management, save/load, active model tracking
+2. **Model Registry** (`model_registry.py`) - Version management, save/load, active model tracking, registry APIs
 3. **Multi-Metric Engine** (`metrics_engine.py`) - 5 fairness metrics with extensible base class architecture
 4. **Advanced Drift Monitor** (`drift_monitor.py`) - Velocity, acceleration, confidence intervals, risk scoring
 5. **Enhanced Explainability** (`explainability_enhanced.py`) - Feature attribution, AI remediation suggestions, confidence weighting
 6. **Report Generator** (`report_generator.py`) - PDF compliance reports (ReportLab) and CSV export
 7. **Dual-Mode Config** (`config.py`) - Demo vs Production environment toggle
 
+**Enterprise Modules (NEW):**
+1. **JWT Authentication** (`auth.py`) - Secure JWT access/refresh tokens, role-based auth (@require_jwt decorator), user management
+2. **Webhook Alerts** (`webhook_utils.py`) - Real-time Slack/email/custom webhook notifications, configurable severity levels
+3. **PostgreSQL Database** (`db_manager.py`) - SQLAlchemy ORM with PostgreSQL support, connection pooling, SQLite fallback
+
 **v3.0 API Endpoints**:
-- `/api/monitor_fairness` - Original fairness monitoring pipeline
-- `/api/evaluate_model` - **NEW** Real ML model predictions with fairness tracking
-- `/api/fairness_summary` - **NEW** All 5 metrics with compliance scoring
-- `/api/explainability` - **NEW** Feature contributions & AI remediation
-- `/api/export_report` - **NEW** PDF compliance report generation [auditor/admin]
-- `/api/export_csv` - **NEW** CSV data export [auditor/admin]
+- `/api/monitor_fairness` - Original fairness monitoring pipeline (now with webhook alerts)
+- `/api/evaluate_model` - Real ML model predictions with fairness tracking
+- `/api/fairness_summary` - All 5 metrics with compliance scoring
+- `/api/explainability` - Feature contributions & AI remediation
+- `/api/export_report` - PDF compliance report generation [auditor/admin]
+- `/api/export_csv` - CSV data export [auditor/admin]
 - `/api/audit_history` - Compliance audit log retrieval
 - `/api/health` - Health check endpoint
 
+**Enterprise Endpoints (NEWEST)**:
+- `/api/auth/login` - JWT login with username/password (returns access + refresh tokens)
+- `/api/auth/refresh` - Refresh expired access token
+- `/api/auth/logout` - Revoke refresh token
+- `/api/webhooks/test` - Test webhook configuration [admin only]
+- `/api/models` - List all registered ML models
+- `/api/models/active` - Get active model metadata
+- `/api/models/<id>/activate` - Set model as active [admin only]
+- `/api/models/<id>` - Get specific model details
+- `/api/models/registry/summary` - Registry statistics
+
 **Legacy Endpoints** (v2.0):
-- `/api/fairness_trend`, `/api/pre_alert`, `/api/predict_fairness_drift`, `/api/submit_predictions`, `/api/verify_alert`, `/api/login`, `/api/get_anchor`
+- `/api/fairness_trend`, `/api/pre_alert`, `/api/predict_fairness_drift`, `/api/submit_predictions`, `/api/verify_alert`, `/api/login` (deprecated), `/api/get_anchor`
+
+**Default Credentials**:
+- **admin** / admin123 (full access - all operations)
+- **auditor** / auditor123 (read + export reports)
+- **monitor** / monitor123 (read-only monitoring)
 
 **Data Flow**: REST API → Data Simulator → Metrics Calculator → Alert Detector → Encryption → Compliance Logger → Explainability → JSON Response
 
 **Security Model**:
+- **JWT Authentication (ENTERPRISE)**: Secure access/refresh token system, 15-min token expiration, 30-day refresh token validity
+- **Role-Based Access Control (ENTERPRISE)**: Three-tier permission model (admin/auditor/monitor)
 - Fernet symmetric encryption for alert messages (uses `cryptography` library)
 - SHA256 hashing for pseudonymization of application IDs
 - Thread-safe logging with file locks for concurrent access protection
 - Encryption key stored in `fernet.key` file (auto-generated on first run)
+- **Protected Endpoints (ENTERPRISE)**: Model registry, webhook testing, report generation require JWT auth
 
 **Compliance Features**:
 - Append-only JSONL audit log format for immutability
@@ -89,16 +122,26 @@ Preferred communication style: Simple, everyday language.
 
 ### Data Storage
 
+**PostgreSQL Database (ENTERPRISE)**:
+- **Production**: PostgreSQL via DATABASE_URL environment variable
+- **Development**: SQLite fallback at `fairlens_backend/fairness.db`
+- **ORM**: SQLAlchemy with connection pooling (5-10 connections)
+- **Tables**: `fairness_trends` (model_name, DIR values, timestamps, alerts, explanations)
+- **Indexes**: Optimized for time-series queries (model_name + timestamp composite index)
+- **Features**: Transaction management, automatic rollback, session handling
+
 **Audit Logging**: JSON Lines (JSONL) format in `fairlens_backend/compliance_audit_log.jsonl`
 - One JSON object per line for streaming reads and efficient parsing
 - Thread-safe writes using threading locks
 - Append-only for immutability guarantees
 
+**Model Registry Storage**: JSON metadata in `fairlens_backend/models/registry.json`
+- Model versioning, activation tracking, performance metrics
+- Binary artifacts stored in `fairlens_backend/models/` (joblib pickles)
+
 **Encryption Keys**: Local file storage in `fairlens_backend/fernet.key`
 - Auto-generated on initialization if not present
 - Note: Production systems should use proper secrets management (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault)
-
-**No Persistent Database**: The system generates synthetic data on-demand and does not persist loan application records
 
 ### Fairness Metrics Implementation
 
@@ -125,10 +168,15 @@ Preferred communication style: Simple, everyday language.
 - **Flask-CORS 6.0.1** - Cross-origin resource sharing support
 - **pandas 2.2.3** - Data manipulation and analysis
 - **numpy 2.2.1** - Numerical computing for random data generation
+- **scikit-learn** - ML model training (Logistic Regression)
 - **cryptography 46.0.3** - Fernet encryption for alert messages
+- **PyJWT** - **ENTERPRISE** JWT token generation and validation
+- **SQLAlchemy** - **ENTERPRISE** PostgreSQL ORM with connection pooling
+- **psycopg2-binary** - **ENTERPRISE** PostgreSQL database adapter
+- **requests 2.32.3** - HTTP library for webhook notifications
+- **ReportLab** - PDF compliance report generation
 - **streamlit 1.41.1** - Alternative dashboard (Python-based)
 - **plotly 6.4.0** - Interactive plotting library (used by Streamlit dashboard)
-- **requests 2.32.3** - HTTP library for API calls
 
 ### JavaScript Frontend Dependencies
 - **React 19.2.0** - UI library

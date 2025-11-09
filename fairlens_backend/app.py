@@ -37,6 +37,8 @@ try:
     from .drift_monitor import DriftMonitor
     from .explainability_enhanced import EnhancedExplainer
     from .report_generator import ReportGenerator
+    from .auth import authenticate_user, refresh_access_token, revoke_refresh_token, require_jwt, get_current_user
+    from .webhook_utils import send_fairness_alert, test_webhook_configuration
 except ImportError:
     from data_simulator import generate_loan_data
     from fairness_metrics import calculate_disparate_impact_ratio
@@ -55,6 +57,8 @@ except ImportError:
     from drift_monitor import DriftMonitor
     from explainability_enhanced import EnhancedExplainer
     from report_generator import ReportGenerator
+    from auth import authenticate_user, refresh_access_token, revoke_refresh_token, require_jwt, get_current_user
+    from webhook_utils import send_fairness_alert, test_webhook_configuration
 
 app = Flask(__name__)
 CORS(app)
@@ -192,6 +196,21 @@ def monitor_fairness():
             )
             logger.info(f"✅ Alert hash verified: {record_hash[:16]}...")
             logger.info(f"🔗 Blockchain anchor: {anchor['tx_id'][:16]}...")
+            
+            # Send webhook alerts for fairness violations
+            webhook_results = send_fairness_alert(
+                alert_type='DIR_VIOLATION',
+                metrics={
+                    'DIR': drifted_metrics['dir'],
+                    'Female_Rate': drifted_metrics['female_rate'],
+                    'Male_Rate': drifted_metrics['male_rate'],
+                    'Drift_Level': drift_level
+                },
+                threshold=0.8,
+                actual_value=drifted_metrics['dir'],
+                record_id=record_hash[:16]
+            )
+            logger.info(f"📢 Webhook alerts sent: {webhook_results}")
             
         else:
             logger.info(f"✅ Model Fairness Stable. DIR = {drifted_metrics['dir']}")
@@ -552,10 +571,181 @@ def submit_predictions():
         }), 500
 
 
-@app.route('/api/login', methods=['POST'])
-def login():
+@app.route('/api/auth/login', methods=['POST'])
+def jwt_login():
     """
-    Simulate role-based login (demo only).
+    JWT-based authentication endpoint.
+    
+    Request Body:
+    -------------
+    {
+        "username": "admin" | "auditor" | "monitor",
+        "password": "your-password"
+    }
+    
+    Default credentials:
+    - admin/admin123 (full access)
+    - auditor/auditor123 (read + export)
+    - monitor/monitor123 (read only)
+    
+    Returns:
+    --------
+    JSON with access token, refresh token, and user info
+    """
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        
+        if not username or not password:
+            return jsonify({
+                "status": "error",
+                "message": "Username and password required"
+            }), 400
+        
+        result = authenticate_user(username, password)
+        
+        if not result['success']:
+            return jsonify({
+                "status": "error",
+                "message": result['message']
+            }), 401
+        
+        return jsonify({
+            "status": "success",
+            "access_token": result['access_token'],
+            "refresh_token": result['refresh_token'],
+            "token_type": result['token_type'],
+            "expires_in": result['expires_in'],
+            "user": result['user']
+        })
+    
+    except Exception as e:
+        logger.error(f"Error in jwt_login: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": "Login failed"
+        }), 500
+
+
+@app.route('/api/auth/refresh', methods=['POST'])
+def jwt_refresh():
+    """
+    Refresh access token using refresh token.
+    
+    Request Body:
+    -------------
+    {
+        "refresh_token": "your-refresh-token"
+    }
+    
+    Returns:
+    --------
+    JSON with new access token
+    """
+    try:
+        data = request.get_json()
+        refresh_token = data.get('refresh_token')
+        
+        if not refresh_token:
+            return jsonify({
+                "status": "error",
+                "message": "Refresh token required"
+            }), 400
+        
+        result = refresh_access_token(refresh_token)
+        
+        if not result['success']:
+            return jsonify({
+                "status": "error",
+                "message": result['message']
+            }), 401
+        
+        return jsonify({
+            "status": "success",
+            "access_token": result['access_token'],
+            "token_type": result['token_type'],
+            "expires_in": result['expires_in']
+        })
+    
+    except Exception as e:
+        logger.error(f"Error in jwt_refresh: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": "Token refresh failed"
+        }), 500
+
+
+@app.route('/api/auth/logout', methods=['POST'])
+@require_jwt()
+def jwt_logout():
+    """
+    Logout by revoking refresh token.
+    
+    Request Body:
+    -------------
+    {
+        "refresh_token": "your-refresh-token"
+    }
+    
+    Returns:
+    --------
+    JSON confirmation
+    """
+    try:
+        data = request.get_json()
+        refresh_token = data.get('refresh_token')
+        
+        if refresh_token:
+            revoke_refresh_token(refresh_token)
+        
+        user = get_current_user()
+        logger.info(f"User '{user['username']}' logged out")
+        
+        return jsonify({
+            "status": "success",
+            "message": "Logged out successfully"
+        })
+    
+    except Exception as e:
+        logger.error(f"Error in jwt_logout: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": "Logout failed"
+        }), 500
+
+
+@app.route('/api/webhooks/test', methods=['GET'])
+@require_jwt(['admin'])
+def test_webhooks():
+    """
+    Test webhook configuration (admin only).
+    
+    Returns:
+    --------
+    JSON with test results for all configured webhooks
+    """
+    try:
+        results = test_webhook_configuration()
+        
+        return jsonify({
+            "status": "success",
+            "results": results
+        })
+    
+    except Exception as e:
+        logger.error(f"Error in test_webhooks: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+
+@app.route('/api/login', methods=['POST'])
+def login_legacy():
+    """
+    DEPRECATED: Legacy role-based login for backward compatibility.
+    Use /api/auth/login instead.
     
     Request Body:
     -------------
@@ -574,7 +764,8 @@ def login():
         if not role:
             return jsonify({
                 "error": "Missing role",
-                "available_roles": list(list_available_roles().keys())
+                "available_roles": list(list_available_roles().keys()),
+                "deprecation_notice": "This endpoint is deprecated. Use /api/auth/login with username/password"
             }), 400
         
         token = get_token_for_role(role)
@@ -582,14 +773,16 @@ def login():
         if not token:
             return jsonify({
                 "error": "Invalid role",
-                "available_roles": list(list_available_roles().keys())
+                "available_roles": list(list_available_roles().keys()),
+                "deprecation_notice": "This endpoint is deprecated. Use /api/auth/login with username/password"
             }), 400
         
         return jsonify({
             "token": token,
             "role": role,
             "message": f"Token generated for role: {role}",
-            "usage": f"Include 'Authorization: Bearer {token}' in request headers"
+            "usage": f"Include 'Authorization: Bearer {token}' in request headers",
+            "deprecation_notice": "This endpoint is deprecated. Use /api/auth/login with username/password"
         })
     
     except Exception as e:
@@ -936,6 +1129,180 @@ def export_csv():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route('/api/models', methods=['GET'])
+@require_jwt()
+def list_models():
+    """
+    List all registered models.
+    
+    Requires: Any authenticated user
+    
+    Returns:
+    --------
+    JSON array of model metadata
+    """
+    try:
+        models = model_registry.list_models()
+        
+        return jsonify({
+            "status": "success",
+            "models": models,
+            "count": len(models)
+        })
+    
+    except Exception as e:
+        logger.error(f"Error in list_models: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+
+@app.route('/api/models/active', methods=['GET'])
+@require_jwt()
+def get_active_model_info():
+    """
+    Get active model information.
+    
+    Requires: Any authenticated user
+    
+    Returns:
+    --------
+    JSON with active model metadata
+    """
+    try:
+        active_model = model_registry.get_active_model()
+        
+        if not active_model:
+            return jsonify({
+                "status": "error",
+                "message": "No active model found"
+            }), 404
+        
+        return jsonify({
+            "status": "success",
+            "model": active_model
+        })
+    
+    except Exception as e:
+        logger.error(f"Error in get_active_model_info: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+
+@app.route('/api/models/<model_id>/activate', methods=['POST'])
+@require_jwt(['admin'])
+def activate_model(model_id):
+    """
+    Set a model as active (admin only).
+    
+    Requires: admin role
+    
+    Parameters:
+    -----------
+    model_id : str
+        ID of the model to activate
+    
+    Returns:
+    --------
+    JSON confirmation
+    """
+    try:
+        success = model_registry.set_active_model(model_id)
+        
+        if not success:
+            return jsonify({
+                "status": "error",
+                "message": f"Failed to activate model: {model_id}"
+            }), 400
+        
+        # Reload the global ml_model
+        global ml_model
+        ml_model = model_registry.load_active_model()
+        
+        return jsonify({
+            "status": "success",
+            "message": f"Model {model_id} activated successfully",
+            "active_model": model_id
+        })
+    
+    except Exception as e:
+        logger.error(f"Error in activate_model: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+
+@app.route('/api/models/<model_id>', methods=['GET'])
+@require_jwt()
+def get_model_details(model_id):
+    """
+    Get detailed information about a specific model.
+    
+    Requires: Any authenticated user
+    
+    Parameters:
+    -----------
+    model_id : str
+        ID of the model
+    
+    Returns:
+    --------
+    JSON with model metadata
+    """
+    try:
+        model_info = model_registry.get_model_metadata(model_id)
+        
+        if not model_info:
+            return jsonify({
+                "status": "error",
+                "message": f"Model not found: {model_id}"
+            }), 404
+        
+        return jsonify({
+            "status": "success",
+            "model": model_info
+        })
+    
+    except Exception as e:
+        logger.error(f"Error in get_model_details: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+
+@app.route('/api/models/registry/summary', methods=['GET'])
+@require_jwt()
+def get_registry_summary():
+    """
+    Get model registry summary statistics.
+    
+    Requires: Any authenticated user
+    
+    Returns:
+    --------
+    JSON with registry statistics
+    """
+    try:
+        summary = model_registry.get_registry_summary()
+        
+        return jsonify({
+            "status": "success",
+            "summary": summary
+        })
+    
+    except Exception as e:
+        logger.error(f"Error in get_registry_summary: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+
 @app.route('/', methods=['GET'])
 def index():
     """Root endpoint with API documentation."""
@@ -965,7 +1332,20 @@ def index():
                 "/api/export_csv": "Export data to CSV [auditor/admin] [v3.0]"
             },
             "authentication": {
-                "/api/login": "Get authentication token (POST: {role: 'monitor'|'auditor'|'admin'})"
+                "/api/auth/login": "JWT login (POST: {username, password}) [ENTERPRISE]",
+                "/api/auth/refresh": "Refresh access token (POST: {refresh_token}) [ENTERPRISE]",
+                "/api/auth/logout": "Logout (POST: {refresh_token}) [ENTERPRISE]",
+                "/api/login": "Legacy token (deprecated, use /api/auth/login)"
+            },
+            "webhooks": {
+                "/api/webhooks/test": "Test webhook configuration [admin only] [ENTERPRISE]"
+            },
+            "model_registry": {
+                "/api/models": "List all registered models [ENTERPRISE]",
+                "/api/models/active": "Get active model info [ENTERPRISE]",
+                "/api/models/<id>/activate": "Set model as active [admin only] [ENTERPRISE]",
+                "/api/models/<id>": "Get model details [ENTERPRISE]",
+                "/api/models/registry/summary": "Registry summary [ENTERPRISE]"
             }
         },
         "fairness_metrics": {
@@ -978,6 +1358,10 @@ def index():
             "compliance_level": "Based on all 5 metrics [v3.0]"
         },
         "features": {
+            "jwt_authentication": "Secure JWT-based auth with refresh tokens [ENTERPRISE]",
+            "webhook_alerts": "Real-time Slack/email notifications [ENTERPRISE]",
+            "postgresql_persistence": "Scalable database with connection pooling [ENTERPRISE]",
+            "model_versioning": "ML model registry & version management [ENTERPRISE]",
             "real_ml_integration": "Production ML model (Logistic Regression) [v3.0]",
             "multi_metric_engine": "5 comprehensive fairness metrics [v3.0]",
             "predictive_drift": "Velocity, acceleration, confidence intervals [v3.0]",
@@ -989,10 +1373,16 @@ def index():
             "role_based_access": "Secure access control for compliance data",
             "live_monitoring": "Real-time fairness checks on AI predictions"
         },
-        "demo_tokens": {
+        "enterprise_credentials": {
+            "admin": "admin/admin123 (full access)",
+            "auditor": "auditor/auditor123 (read + export)",
+            "monitor": "monitor/monitor123 (read only)"
+        },
+        "demo_tokens_legacy": {
             "monitor": "MONITOR123",
             "auditor": "AUDITOR123",
-            "admin": "ADMIN123"
+            "admin": "ADMIN123",
+            "note": "Deprecated - use JWT login at /api/auth/login"
         },
         "usage_examples": {
             "basic_check": "GET /api/monitor_fairness?n_samples=1000&drift_level=0.5",
