@@ -1,0 +1,135 @@
+2025-11-09 17:05:02.68
+c44bcd69
+System
+command finished with error [streamlit run app.py --server.port 5000]: exit status 2
+2025-11-09 17:05:10.94
+c44bcd69
+User
+Usage: streamlit run [OPTIONS] [TARGET] [ARGS]...
+2025-11-09 17:05:10.94
+c44bcd69
+User
+Try 'streamlit run --help' for help.
+2025-11-09 17:05:10.94
+c44bcd69
+User
+Error: Invalid value: File does not exist: app.py
+2025-11-09 17:05:11.29
+c44bcd69
+System
+command finished with error [streamlit run app.py --server.port 5000]: exit status 2
+2025-11-09 17:05:12.37
+c44bcd69
+System
+crash loop detected
+2025-11-09 17:40:23.18
+cc444e57
+System
+starting up user application
+2025-11-09 17:40:23.18
+cc444e57
+System
+metasidecar: loaded enterprise status from environment is_enterprise=true
+2025-11-09 17:40:23.18
+cc444e57
+System
+forwarding local port 5000 to external port 80 (mapped as 1104)
+2025-11-09 17:40:26.33
+cc444e57
+User
+Usage: streamlit run [OPTIONS] [TARGET] [ARGS]...
+2025-11-09 17:40:26.33
+cc444e57
+User
+Try 'streamlit run --help' for help.
+2025-11-09 17:40:26.33
+cc444e57
+User
+Error: Invalid value: File does not exist: app.py
+2025-11-09 17:40:26.46
+cc444e57
+System
+command finished with error [streamlit run app.py --server.port 5000]: exit status 2
+2025-11-09 17:40:27.13
+cc444e57
+User
+Usage: streamlit run [OPTIONS] [TARGET] [ARGS]...
+2025-11-09 17:40:27.13
+cc444e57
+User
+Try 'streamlit run --help' for help.
+2025-11-09 17:40:27.13
+cc444e57
+User
+Error: Invalid value: File does not exist: app.py
+2025-11-09 17:40:27.27
+cc444e57
+System
+command finished with error [streamlit run app.py --server.port 5000]: exit status 2
+2025-11-09 17:40:27.93
+cc444e57
+User
+Usage: streamlit run [OPTIONS] [TARGET] [ARGS]...
+2025-11-09 17:40:27.93
+cc444e57
+User
+Try 'streamlit run --help' for help.
+2025-11-09 17:40:27.93
+cc444e57
+User
+Error: Invalid value: File does not exist: app.py
+2025-11-09 17:40:28.11
+cc444e57
+System
+command finished with error [streamlit run app.py --server.port 5000]: exit status 2
+2025-11-09 17:40:28.97
+cc444e57
+User
+Usage: streamlit run [OPTIONS] [TARGET] [ARGS]...
+2025-11-09 17:40:28.97
+cc444e57
+User
+Try 'streamlit run --help' for help.
+2025-11-09 17:40:28.97
+cc444e57
+User
+Error: Invalid value: File does not exist: app.py
+2025-11-09 17:40:29.12
+cc444e57
+System
+command finished with error [streamlit run app.py --server.port 5000]: exit status 2
+2025-11-09 17:40:30.28
+cc444e57
+User
+Usage: streamlit run [OPTIONS] [TARGET] [ARGS]...
+2025-11-09 17:40:30.28
+cc444e57
+User
+Try 'streamlit run --help' for help.
+2025-11-09 17:40:30.28
+cc444e57
+User
+2025-11-09 17:40:30.28
+cc444e57
+User
+Error: Invalid value: File does not exist: app.py
+2025-11-09 17:40:30.43
+cc444e57
+System
+command finished with error [streamlit run app.py --server.port 5000]: exit status 2
+2025-11-09 17:40:31.88
+cc444e57
+User
+Usage: streamlit run [OPTIONS] [TARGET] [ARGS]...
+2025-11-09 17:40:31.88
+cc444e57
+User
+Try 'streamlit run --help' for help.
+2025-11-09 17:40:31.88
+cc444e57
+User
+Error: Invalid value: File does not exist: app.py
+2025-11-09 17:40:32.01
+cc444e57
+System
+command finished with error [streamlit run app.py --server.port 5000]: exit status 2

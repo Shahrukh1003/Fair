@@ -38,7 +38,7 @@ Preferred communication style: Simple, everyday language.
 
 **Data Visualization**: Recharts v3 for rendering fairness metrics, approval rate comparisons, and DIR trend charts
 
-**API Communication**: Axios for HTTP requests to the Flask backend on port 8000
+**API Communication**: Axios for HTTP requests to Flask backend (port 8000 dev, port 5000 production)
 
 **Key Design Patterns**:
 - Component-based architecture with clear separation of concerns
@@ -175,8 +175,6 @@ Preferred communication style: Simple, everyday language.
 - **psycopg2-binary** - **ENTERPRISE** PostgreSQL database adapter
 - **requests 2.32.3** - HTTP library for webhook notifications
 - **ReportLab** - PDF compliance report generation
-- **streamlit 1.41.1** - Alternative dashboard (Python-based)
-- **plotly 6.4.0** - Interactive plotting library (used by Streamlit dashboard)
 
 ### JavaScript Frontend Dependencies
 - **React 19.2.0** - UI library
@@ -198,10 +196,21 @@ Preferred communication style: Simple, everyday language.
 - **@types/react-dom 19.2.2** - TypeScript definitions for React DOM
 - **@types/node 24.10.0** - TypeScript definitions for Node.js
 
-### Service Ports
-- **Flask API**: Port 8000
-- **Vite Dev Server**: Port 5173 (default)
-- **Streamlit Dashboard**: Port 5000 (alternative Python dashboard)
+### Deployment Architecture
+
+**Development Mode**:
+- Flask API on port 8000 (workflow: `flask-api-backend`)
+- Vite dev server on port 5173 (served by Replit webview proxy)
+- React app makes API calls to port 8000
+
+**Production Deployment** (Replit Autoscale):
+1. Build step: `npm run build` - Compiles React app to `dist/` folder
+2. Run command: `FLASK_PORT=5000 python fairlens_backend/app.py`
+3. Flask serves:
+   - Static React frontend from `/dist` folder (all routes)
+   - REST API endpoints from `/api/*` paths
+4. Single port 5000 exposed to internet (mapped to external port 80)
+5. No separate frontend server - unified deployment
 
 ### External Services
 None - The system is fully self-contained and does not integrate with external APIs, databases, or cloud services. All data is synthetically generated and processed locally.

@@ -6,7 +6,7 @@ packages = ["cargo", "freetype", "glibcLocales", "libiconv", "libxcrypt", "opens
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["bash", "-c", "FLASK_PORT=5000 python fairlens_backend/app.py"]
+run = ["sh", "-c", "FLASK_PORT=5000 python fairlens_backend/app.py"]
 build = ["npm", "run", "build"]
 
 [workflows]
