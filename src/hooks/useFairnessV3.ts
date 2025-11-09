@@ -96,7 +96,7 @@ export interface ExplainabilityResponse {
   };
 }
 
-export function useFairnessSummary(nSamples: number = 1000, driftLevel: number = 0.5, enabled: boolean = true) {
+export function useFairnessSummary(nSamples: number = 1000, driftLevel: number = 0.5, autoRefresh: boolean = false) {
   return useQuery({
     queryKey: ['fairness-summary', nSamples, driftLevel],
     queryFn: async () => {
@@ -106,12 +106,12 @@ export function useFairnessSummary(nSamples: number = 1000, driftLevel: number =
       );
       return data;
     },
-    refetchInterval: 30000,
-    enabled,
+    refetchInterval: autoRefresh ? 30000 : false,
+    enabled: true,
   });
 }
 
-export function useExplainability(nSamples: number = 1000, driftLevel: number = 0.5, enabled: boolean = true) {
+export function useExplainability(nSamples: number = 1000, driftLevel: number = 0.5, autoRefresh: boolean = false) {
   return useQuery({
     queryKey: ['explainability', nSamples, driftLevel],
     queryFn: async () => {
@@ -121,8 +121,8 @@ export function useExplainability(nSamples: number = 1000, driftLevel: number = 
       );
       return data;
     },
-    refetchInterval: 30000,
-    enabled,
+    refetchInterval: autoRefresh ? 30000 : false,
+    enabled: true,
   });
 }
 
